@@ -36,3 +36,7 @@ th {
   border: 1px solid lightblue;
   text-align: center;
 }
+
+#form {
+  outline: 4px solid lightsalmon;
+}

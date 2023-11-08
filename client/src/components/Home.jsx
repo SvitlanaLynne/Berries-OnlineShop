@@ -1,10 +1,10 @@
-import ImportBar from "./ImportBar";
+// import ImportBar from "./ImportBar";
 import Products from "./Products";
 
 function Home() {
   return (
     <div>
-      <ImportBar />
+      {/* <ImportBar /> */}
       <Products />
     </div>
   );
