@@ -1,3 +1,7 @@
+@import "./components/import-Bar/ImportBar.css";
+@import "./components/products/Products.css";
+@import "./components/pages/home/Home.css";
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
@@ -7,36 +11,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-#ImportBar_Container {
-  display: flex;
-  justify-content: space-between;
-  outline: 1px solid grey;
-}
-#import_buttons_group {
-  outline: 1px solid pink;
-}
-
-#Products_Container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  outline: 1px solid grey;
-}
-
 #filters {
   outline: 1px solid green;
-}
-
-table {
-  width: 50%;
-  border-collapse: collapse;
-}
-td,
-th {
-  border: 1px solid lightblue;
-  text-align: center;
-}
-
-#form {
-  outline: 4px solid lightsalmon;
 }

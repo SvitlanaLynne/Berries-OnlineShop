@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import ImportBar from "../import-Bar";
 
 function Products() {
   const [formRendered, setFormRendered] = useState(false);
@@ -57,21 +58,15 @@ function Products() {
       kg: kg,
       price: price,
     };
+    console.log("Data gathered from the form", formData);
   }
 
   return (
     <>
       {/* ---------- import bar ---------- */}
-      <section id="ImportBar_Container">
-        <div id="import_buttons_group">
-          <button>Import</button>
-          <button id="addProductButton" onClick={addForm}>
-            Add Product
-          </button>
-        </div>
-        <img src="" alt="Berries Project Logo" />
-      </section>
-      <main id="Products_Container">
+      <ImportBar addForm={addForm} />
+
+      <main id="Products-Container">
         {/* ---------- filters ---------- */}
         <aside id="filters">Filter Block</aside>
 
@@ -109,10 +104,22 @@ function Products() {
                 </td>
                 <td>In Stock status</td>
                 <td>
-                  <input type="number" name="kg" placeholder="1" required />
+                  <input
+                    type="number"
+                    name="kg"
+                    onChange={handleNameChange}
+                    placeholder="1"
+                    required
+                  />
                 </td>
                 <td>
-                  <input type="number" name="price" placeholder="8" required />
+                  <input
+                    type="number"
+                    name="price"
+                    onChange={handleNameChange}
+                    placeholder="8"
+                    required
+                  />
                 </td>
                 <td>
                   <button onClick={handleSubmit}>Submit</button>
