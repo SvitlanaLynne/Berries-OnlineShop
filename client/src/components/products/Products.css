@@ -5,6 +5,20 @@
   outline: 1px solid grey;
 }
 
+#action-button {
+  width: 1 rem;
+  height: 2 rem;
+  border-radius: 5px;
+  background-color: cornflowerblue;
+}
+
+#action-button-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* margin: 0 auto; */
+}
+
 table {
   width: 50%;
   border-collapse: collapse;
