@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import CRUDS from "./CRUDS.js";
 
 // ----- MIDDLEWARE -----
 
@@ -17,8 +18,11 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+// ----- PROCESS CRUD OPERATIONS ------
+app.use("/", CRUDS);
+
 // ----- RUN ON PORT -----
 
 app.listen(PORT, () => {
-  console.log("Server is running on port: ", `${PORT}`);
+  console.log("Server is running on port:", `${PORT}`);
 });
