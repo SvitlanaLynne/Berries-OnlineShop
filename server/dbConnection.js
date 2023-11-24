@@ -28,7 +28,7 @@ export function connectDB() {
     })
     .catch((error) => {
       console.error("\nUnsuccessful Connection to MongoDB due to:", error);
-      throw error; // Rethrow the error for handling in the higher-lever caller
+      handleError(error);
     });
 }
 

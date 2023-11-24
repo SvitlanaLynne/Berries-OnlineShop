@@ -10,6 +10,6 @@ const berrySchema = new Schema({
   price: Number,
 });
 
-const BerryModel = model("Berry", berrySchema);
+const Berry = model("Berry", berrySchema);
 
-export default BerryModel;
+export default Berry;

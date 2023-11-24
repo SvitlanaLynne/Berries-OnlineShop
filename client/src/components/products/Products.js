@@ -5,6 +5,15 @@ function Products() {
   const [formRendered, setFormRendered] = useState(false);
   const [actionDropDownShown, setActionDropDownShown] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
+  const [formData, setFormData] = useState({
+    picture: "",
+    name: "",
+    availability: true,
+    kg: "",
+    price: "",
+  });
+
+  const Url = "http://localhost:5050";
 
   // ----- HIDE/SHOW -----
   useEffect(() => {
@@ -47,33 +56,32 @@ function Products() {
 
   // ----- HANDLERS -----
 
-  // gathering form info
-
-  const [name, setName] = useState("");
-  const [kg, setKg] = useState("");
-  const [price, setPrice] = useState("");
-
-  function handleNameChange(e) {
+  function handleInputChange(e) {
     const { name, value } = e.target;
 
-    if (name === "name") {
-      setName(value);
-    } else if (name === "kg") {
-      setKg(value);
-    } else if (name === "price") {
-      setPrice(value);
-    }
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   }
 
   function handleSubmit(e) {
     e.preventDefault();
 
-    const formData = {
-      name: name,
-      kg: kg,
-      price: price,
-    };
-    console.log("Data gathered from the form", formData);
+    try {
+      fetch(Url + "/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+    } catch (error) {
+      console.log("Error during posting the form data", error);
+      return;
+    }
+
+    console.log("Form submitted with the following data:", formData);
   }
 
   function showDropDown() {
@@ -85,6 +93,8 @@ function Products() {
 
     if (selectedOption === "Delete") {
       handleDelete();
+    } else if (selectedOption === "Delete All") {
+      handleDeleteAll();
     }
   }
 
@@ -105,6 +115,18 @@ function Products() {
       .catch((err) => {
         console.log("Error while deleting: ", err);
       });
+  }
+  function handleDeleteAll() {
+    fetch(Url + "/All", {
+      method: "DELETE",
+      Headers: { "Content-Type": "application/json" },
+    }).then((res) => {
+      if (!res.ok) {
+        throw new Error(`Delete  ALL operation failed. ${res.status}`);
+      } else {
+        console.log("All has been deleted successfully.");
+      }
+    });
   }
 
   function handleCheckedChange() {
@@ -140,7 +162,7 @@ function Products() {
                     <select onChange={handleOptionChange}>
                       <option></option>
                       <option>Change Category</option>
-                      <option>Delete</option>
+                      <option>Delete All</option>
                     </select>
                   ) : (
                     ""
@@ -166,7 +188,8 @@ function Products() {
                   <input
                     type="text"
                     name="name"
-                    onChange={handleNameChange}
+                    value={formData.name}
+                    onChange={handleInputChange}
                     placeholder="Blueberry"
                     required
                   />
@@ -176,7 +199,8 @@ function Products() {
                   <input
                     type="number"
                     name="kg"
-                    onChange={handleNameChange}
+                    value={formData.kg}
+                    onChange={handleInputChange}
                     placeholder="1"
                     required
                   />
@@ -185,7 +209,8 @@ function Products() {
                   <input
                     type="number"
                     name="price"
-                    onChange={handleNameChange}
+                    value={formData.price}
+                    onChange={handleInputChange}
                     placeholder="8"
                     required
                   />
