@@ -25,10 +25,10 @@ export function connectDB() {
         default:
           console.log("\nUnknown connection state");
       }
+      console.log("Database Name:", mongoose.connection.name);
     })
     .catch((error) => {
       console.error("\nUnsuccessful Connection to MongoDB due to:", error);
-      handleError(error);
     });
 }
 
