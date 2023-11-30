@@ -12,6 +12,7 @@ function Products() {
     kg: "",
     price: "",
   });
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
   const Url = "http://localhost:5050";
 
@@ -55,6 +56,27 @@ function Products() {
   }
 
   // ----- HANDLERS -----
+
+  const handleImagesSelection = (e) => {
+    setSelectedFiles(Array.from(e.target.files));
+  };
+
+  const handleImagesUpload = async () => {
+    const formData = new FormData();
+    selectedFiles.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    fetch(`${Url + "/upload/images"}`, {
+      method: "POST",
+      body: formData,
+    }).catch((error) => {
+      console.error("Error while sending images to server:", error);
+      return;
+    });
+
+    setSelectedFiles([]);
+  };
 
   function handleInputChange(e) {
     const { name, value } = e.target;
@@ -182,7 +204,12 @@ function Products() {
                 {/* ---------- form ---------- */}
                 <td>-</td>
                 <td>
-                  <button>Add picture</button>
+                  <input
+                    type="file"
+                    multiple
+                    onChange={handleImagesSelection}
+                  ></input>
+                  <button onClick={handleImagesUpload}>Add picture</button>
                 </td>
                 <td>
                   <input
