@@ -2,7 +2,14 @@ import express from "express";
 import { connectDB } from "./dbConnection.js";
 import Berry from "./model.js";
 import { initializeApp } from "firebase/app";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  listAll,
+  deleteObject,
+} from "firebase/storage";
 import multer from "multer";
 
 // ----- FOR CRUDS: EXPRESS ROUTER(ENDPOINTS), MULTER, DB CONNECTION, FIREBASE -----
@@ -15,18 +22,29 @@ const multerUpload = multer({ storage: multerStorage });
 const fire = initializeApp(firebaseConfig);
 console.log("Collection Name:", Berry.collection.name);
 
+// ----- GET -----
+
+router.get("/products", async (req, res) => {
+  const allProducts = await Berry.find();
+  try {
+    res.send(allProducts).status(204);
+    console.log("\nAll products found successfully");
+  } catch (error) {
+    console.log("Error while getting the products from DB:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 // ----- UPLOAD MANY IMAGES -----
 
-// --- Images to MULTER Buffer ---
-
-// -- Multiple files:
 const storage = getStorage(fire);
 const storageRef = ref(storage); // points to the root of the Cloud Storage bucket.
-const imagesRef = ref(storage, "images"); // imagesRef now points to 'images'.
+const folderRef = ref(storage, "images"); // points to 'images' folder.
 
 let imageObjectsArr = [];
 
 router.post(
+  // --- Images to MULTER Buffer ---
   "/upload/images",
   multerUpload.array("images", 15),
   async (req, res) => {
@@ -39,68 +57,44 @@ router.post(
       data: file.buffer,
       contentType: file.mimetype,
     }));
-    console.log("array of images in the multer's buffer:", imageObjectsArr);
 
+    // --- Images to FIREBASE ---
     try {
-      uploadBytes(imagesRef, imageObjectsArr.data).then((snapshot) => {
-        console.log("uploadBytes invoked...");
-      });
+      for (const imageObject of imageObjectsArr) {
+        const eachImageRef = ref(storage, `images/${imageObject.originalname}`);
+        const snapshot = await uploadBytes(eachImageRef, imageObject.data);
+        console.log(
+          "\nImage uploaded. In-storage Path:",
+          snapshot.ref.fullPath
+        );
 
-      // getDownloadURL(uploadBytes.snapshot.ref).then((downloadURL) => {
-      //   console.log("IMAGE AVAILABLE at:", downloadURL);
-      // });
+        const downloadURL = await getDownloadURL(snapshot.ref); // Get the download URL
+        console.log("\nDownload URL:", downloadURL);
+      }
+
+      res.status(200).send("Images uploaded successfully.");
     } catch (error) {
       console.log("Error while uploading from buffer to the cloud:", error);
+      res.status(500).send("Internal Server Error");
     }
   }
 );
 
-// -- Single file:
-
-// let newImage = {};
-// router.post(
-//   "/upload/image",
-//   multerUpload.single("newImage"),
-//   async (req, res) => {
-//     console.log("original:", req.file, req.body);
-//     newImage = {
-//       originalname: req.file.originalname,
-//       data: req.file.buffer,
-//       contentType: req.file.mimetype,
-//     };
-//     console.log("my new object:", newImage);
-//   }
-// );
-
-// -- for uploading a single image (not complete)
-// const newUploadedImageRef = ref(storage, `images/${newImage.originalname}`);
-// if (Object.keys(newImage).length > 0) {
-//   try {
-//     uploadBytes(newUploadedImageRef, newImage.data).then((snapshot) => {
-//       console.log("Uploaded an image!");
-//     });
-
-//     getDownloadURL(---->uploadTask.snapshot.ref).then((downloadURL) => {
-//       console.log("IMAGE AVAILABLE at:", downloadURL);
-//     });
-//   } catch (error) {
-//     console.log("Error while uploading from buffer to the cloud:", error);
-//   }
-// } else {
-//   console.log("No image in the buffer to upload yet");
-// }
-
 // ----- INSERT ONE -----
 
-router.post("/products", async (req, res) => {
+router.post("/productAdd", async (req, res) => {
   const existingProduct = await Berry.findOne({ name: req.body.name });
 
   if (existingProduct) {
-    return res.status(400).send("Product with the same name already exists.");
+    console.log("Product with the same name already exists.");
+    return res
+      .status(400)
+      .send(
+        "Product with the same name already exists, hence your form was not submitted."
+      );
   }
 
   const newProduct = await Berry.create({
-    picture: req.body.picture,
     name: req.body.name,
     availability: req.body.availability,
     kg: req.body.kg,
@@ -119,6 +113,7 @@ router.post("/products", async (req, res) => {
 // ----- DELETE ALL ------
 
 router.delete("/All", async (req, res) => {
+  // IN MONGO
   try {
     await Berry.deleteMany({});
     res.status(204).send("\nIntire Collection was DELETED\n");
@@ -127,6 +122,30 @@ router.delete("/All", async (req, res) => {
     console.log("Error while deleteing All", error);
     res.status(500).send("Internal Server Error");
   }
+  // IN FIREBASE (IMAGES)
+  // --- List of images in the folder ---
+  listAll(folderRef)
+    .then((res) => {
+      res.prefixes.forEach((folderRef) => {
+        console.log("Subdirectory found:", folderRef.name);
+      });
+      res.items.forEach((itemRef) => {
+        console.log("\nItems found in the folder:", itemRef.name);
+      });
+      const promisesToDelArr = res.items.map((item) => {
+        return deleteObject(item); // delete() method returns promises
+      });
+      return Promise.all(promisesToDelArr); // so, resolve them and output an array of results
+    })
+    .then(() => {
+      console.log("All images have been deleted successfully.");
+    })
+    .catch((error) => {
+      console.error(
+        "An error occurred while forming a list or deletion.",
+        error
+      );
+    });
 });
 
 export default router;
