@@ -25,3 +25,9 @@ yarn-error.log*
 
 # folders
 Source
+
+# custom
+separate_B.js
+separate_F.js
+united_B.js
+united_F.js

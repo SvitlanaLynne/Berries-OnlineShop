@@ -10,27 +10,26 @@ function Products() {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
-    availability: true,
     kg: "",
     price: "",
   });
 
   const Url = "http://localhost:5050";
 
-  // ----- FETCH PRODUCTS -----
+  // ----- GET PRODUCTS -----
 
+  const fetchData = async () => {
+    fetch(Url + "/products")
+      .then((res) => res.json())
+      .then((data) => {
+        setData(data);
+        setIsLoading(false);
+      })
+      .catch(() =>
+        window.alert("Unexpected error. Unable to reach the server.")
+      );
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      fetch(Url + "/products")
-        .then((res) => res.json())
-        .then((data) => {
-          setData(data);
-          setIsLoading(false);
-        })
-        .catch((error) =>
-          window.alert("Unexpected error. Unable to reach the server.")
-        );
-    };
     fetchData();
   }, []);
 
@@ -72,81 +71,44 @@ function Products() {
     e.stopPropagation(); // Stop the click event from reaching the document when "Add Product" is clicked
     setFormRendered((prevRendered) => !prevRendered);
   }
-
-  // ----- HANDLERS -----
-
-  const handleImagesSelection = (e) => {
-    setSelectedFiles(Array.from(e.target.files));
-  };
-
+  // ----- UPLOAD PRODUCT AND IMAGES -----
   const handleProductUpload = async () => {
     try {
-      // --- Data upload ---
-      const dataResponse = await fetch(Url + "/productAdd", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const formDataWithImages = new FormData();
 
-      if (!dataResponse.ok) {
-        const errorMessage = await dataResponse.text();
-        console.log("Error during posting the form data");
-        window.alert(errorMessage);
-        return;
-      }
-
-      console.log("Form submitted with the following data:", formData);
-
-      // --- Images upload ---
-      const imgFormData = new FormData();
       selectedFiles.forEach((file) => {
-        imgFormData.append("images", file);
+        formDataWithImages.append("images", file);
       });
 
-      const imagesResponse = await fetch(`${Url + "/upload/images"}`, {
+      // Append other form data fields
+      for (const key in formData) {
+        formDataWithImages.append(key, formData[key]);
+      }
+
+      const response = await fetch(`${Url}/upload/form`, {
         method: "POST",
-        body: imgFormData,
+        body: formDataWithImages,
       });
 
-      if (!imagesResponse.ok) {
-        const errorMessage = await dataResponse.text();
-        console.error("Error while sending images to server:");
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        console.error(
+          `Error during form and image upload. Status: ${response.status}, Message: ${errorMessage}`
+        );
         window.alert(errorMessage);
         return;
       }
 
+      console.log("Form and images submitted successfully");
       setSelectedFiles([]);
       fetchData();
     } catch (error) {
       console.error("An unexpected error occurred:", error);
+      window.alert("An unexpected error occurred. Please try again later.");
     }
   };
 
-  function handleInputChange(e) {
-    const { name, value } = e.target;
-
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-      availability: formData.kg !== 0,
-    }));
-  }
-
-  function showDropDown() {
-    setActionDropDownShown((prev) => !prev);
-  }
-
-  function handleOptionChange(e) {
-    const selectedOption = e.target.value;
-
-    if (selectedOption === "Delete") {
-      handleDelete();
-    } else if (selectedOption === "Delete All") {
-      handleDeleteAll();
-    }
-  }
+  // ----- DELETE ONE -----
 
   function handleDelete() {
     const itemsId = "______";
@@ -167,6 +129,7 @@ function Products() {
       });
   }
 
+  // ----- DELETE ALL -----
   function handleDeleteAll() {
     fetch(Url + "/All", {
       method: "DELETE",
@@ -178,6 +141,37 @@ function Products() {
         console.log("All has been deleted successfully.");
       }
     });
+    fetchData();
+  }
+  // ----- HANDLERS -----
+
+  const handleImagesSelection = (e) => {
+    setSelectedFiles(Array.from(e.target.files));
+  };
+
+  function handleInputChange(e) {
+    const { name, value } = e.target;
+
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+      availability: formData.kg !== "0",
+    }));
+    console.log("AVAILABILITY", formData.availability);
+  }
+
+  function showDropDown() {
+    setActionDropDownShown((prev) => !prev);
+  }
+
+  function handleOptionChange(e) {
+    const selectedOption = e.target.value;
+
+    if (selectedOption === "Delete") {
+      handleDelete();
+    } else if (selectedOption === "Delete All") {
+      handleDeleteAll();
+    }
   }
 
   function handleCheckedChange() {
@@ -283,7 +277,7 @@ function Products() {
 
               {/* ---------- products ---------- */}
               {data.map((product) => (
-                <tr>
+                <tr key={product.id}>
                   <td>
                     <div id="check-box-group">
                       <input
@@ -293,7 +287,15 @@ function Products() {
                       />
                     </div>
                   </td>
-                  <td>picture</td>
+                  <td>
+                    {product.images.map((imgUrl, index) => (
+                      <img
+                        key={`${product.id}-${index}`}
+                        src={imgUrl}
+                        alt={`${product.name} ${index + 1}`}
+                      />
+                    ))}
+                  </td>
                   <td>{product.name}</td>
                   <td>
                     {product.availability === true ? (

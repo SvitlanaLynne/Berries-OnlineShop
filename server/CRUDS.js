@@ -11,6 +11,7 @@ import {
   deleteObject,
 } from "firebase/storage";
 import multer from "multer";
+// import { Promise } from "mongoose";
 
 // ----- FOR CRUDS: EXPRESS ROUTER(ENDPOINTS), MULTER, DB CONNECTION, FIREBASE -----
 
@@ -35,80 +36,71 @@ router.get("/products", async (req, res) => {
   }
 });
 
-// ----- UPLOAD MANY IMAGES -----
+// ----- UPLOAD IMAGES -----
 
 const storage = getStorage(fire);
 const storageRef = ref(storage); // points to the root of the Cloud Storage bucket.
 const folderRef = ref(storage, "images"); // points to 'images' folder.
 
-let imageObjectsArr = [];
-
 router.post(
-  // --- Images to MULTER Buffer ---
-  "/upload/images",
+  "/upload/form",
   multerUpload.array("images", 15),
   async (req, res) => {
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).send("No files reached the server.");
-    }
+    let imageObjectsArr;
 
-    imageObjectsArr = req.files.map((file) => ({
-      originalname: file.originalname,
-      data: file.buffer,
-      contentType: file.mimetype,
-    }));
-
-    // --- Images to FIREBASE ---
     try {
-      for (const imageObject of imageObjectsArr) {
-        const eachImageRef = ref(storage, `images/${imageObject.originalname}`);
-        const snapshot = await uploadBytes(eachImageRef, imageObject.data);
-        console.log(
-          "\nImage uploaded. In-storage Path:",
-          snapshot.ref.fullPath
-        );
-
-        const downloadURL = await getDownloadURL(snapshot.ref); // Get the download URL
-        console.log("\nDownload URL:", downloadURL);
+      if (!req.files || req.files.length === 0) {
+        return res.status(400).send("No files reached the server.");
       }
 
-      res.status(200).send("Images uploaded successfully.");
+      imageObjectsArr = req.files.map((file) => ({
+        originalname: file.originalname,
+        data: file.buffer,
+        contentType: file.mimetype,
+      }));
+
+      res.status(200).send("Images in the Multer's buffer.");
     } catch (error) {
-      console.log("Error while uploading from buffer to the cloud:", error);
+      console.log("Error while processing Multer files:", error);
+      return res.status(500).send("Internal Server Error");
+    }
+
+    // --- to FIREBASE ---
+    const promises = imageObjectsArr.map(async (imageObject) => {
+      const eachImageRef = ref(storage, `images/${imageObject.originalname}`);
+      const snapshot = await uploadBytes(eachImageRef, imageObject.data);
+      return await getDownloadURL(snapshot.ref);
+    });
+
+    // --- data to MONGO DB ---
+    try {
+      const imageURLs = await Promise.all(promises);
+      const existingProduct = await Berry.findOne({ name: req.body.name });
+
+      if (existingProduct) {
+        console.log("Product with the same name already exists.");
+        return res
+          .status(400)
+          .send(
+            "Product with the same name already exists, hence your form was not submitted."
+          );
+      }
+
+      const newProduct = await Berry.create({
+        name: req.body.name,
+        availability: req.body.availability,
+        kg: req.body.kg,
+        price: req.body.price,
+        images: imageURLs,
+      });
+      res.status(204);
+      console.log("ONE NEW PRODUCT CREATED IN DB:", newProduct);
+    } catch (error) {
+      console.log("Error while inserting a product to DB:", error);
       res.status(500).send("Internal Server Error");
     }
   }
 );
-
-// ----- INSERT ONE -----
-
-router.post("/productAdd", async (req, res) => {
-  const existingProduct = await Berry.findOne({ name: req.body.name });
-
-  if (existingProduct) {
-    console.log("Product with the same name already exists.");
-    return res
-      .status(400)
-      .send(
-        "Product with the same name already exists, hence your form was not submitted."
-      );
-  }
-
-  const newProduct = await Berry.create({
-    name: req.body.name,
-    availability: req.body.availability,
-    kg: req.body.kg,
-    price: req.body.price,
-  });
-
-  try {
-    res.send(newProduct).status(204);
-    console.log("ONE NEW PRODUCT CREATED IN DB:", newProduct);
-  } catch (error) {
-    console.log("Error while inserting a product to DB:", error);
-    res.status(500).send("Internal Server Error");
-  }
-});
 
 // ----- DELETE ALL ------
 
