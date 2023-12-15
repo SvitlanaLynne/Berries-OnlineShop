@@ -1,15 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import ImportBar from "../import-Bar";
 
 function Products() {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(2);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [productsLoaded, setProductsLoaded] = useState(0);
   const [formRendered, setFormRendered] = useState(false);
   const [actionDropDownShown, setActionDropDownShown] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
+    availability: true,
     kg: "",
     price: "",
   });
@@ -18,20 +24,30 @@ function Products() {
 
   // ----- GET PRODUCTS -----
 
-  const fetchData = async () => {
-    fetch(Url + "/products")
-      .then((res) => res.json())
-      .then((data) => {
-        setData(data);
-        setIsLoading(false);
-      })
-      .catch(() =>
-        window.alert("Unexpected error. Unable to reach the server.")
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await fetch(
+        Url + `/products?page=${page}&pageSize=${pageSize}`
       );
-  };
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const { data, total } = await response.json();
+      setTotalProducts(total);
+      setProductsLoaded((prev) => prev + data.length);
+      setData((prevData) => [...prevData, ...data]);
+    } catch (error) {
+      window.alert("Unexpected error. Unable to reach the server.");
+    } finally {
+      setIsLoading(false);
+      setPageLoading(false);
+    }
+  }, [page, pageSize]);
+
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   // ----- HIDE/SHOW the form -----
   useEffect(() => {
@@ -67,10 +83,10 @@ function Products() {
     };
   }, [formRendered, actionDropDownShown]);
 
-  function addForm(e) {
+  const addForm = (e) => {
     e.stopPropagation(); // Stop the click event from reaching the document when "Add Product" is clicked
     setFormRendered((prevRendered) => !prevRendered);
-  }
+  };
   // ----- UPLOAD PRODUCT AND IMAGES -----
   const handleProductUpload = async () => {
     try {
@@ -80,28 +96,28 @@ function Products() {
         formDataWithImages.append("images", file);
       });
 
-      // Append other form data fields
+      // Append data from the form
       for (const key in formData) {
         formDataWithImages.append(key, formData[key]);
       }
 
-      const response = await fetch(`${Url}/upload/form`, {
+      const serverResponse = await fetch(`${Url}/upload/form`, {
         method: "POST",
         body: formDataWithImages,
       });
 
-      if (!response.ok) {
-        const errorMessage = await response.text();
+      if (!serverResponse.ok) {
+        const errorMessage = await serverResponse.text();
         console.error(
-          `Error during form and image upload. Status: ${response.status}, Message: ${errorMessage}`
+          `Error during form and image upload. Status: ${serverResponse.status}, Message: ${errorMessage}`
         );
         window.alert(errorMessage);
         return;
       }
 
       console.log("Form and images submitted successfully");
-      setSelectedFiles([]);
-      fetchData();
+      await fetchData();
+      await setSelectedFiles([]);
     } catch (error) {
       console.error("An unexpected error occurred:", error);
       window.alert("An unexpected error occurred. Please try again later.");
@@ -131,17 +147,23 @@ function Products() {
 
   // ----- DELETE ALL -----
   function handleDeleteAll() {
-    fetch(Url + "/All", {
-      method: "DELETE",
-      Headers: { "Content-Type": "application/json" },
-    }).then((res) => {
-      if (!res.ok) {
-        throw new Error(`Delete  ALL operation failed. ${res.status}`);
-      } else {
-        console.log("All has been deleted successfully.");
-      }
-    });
-    fetchData();
+    try {
+      fetch(Url + "/All", {
+        method: "DELETE",
+        Headers: { "Content-Type": "application/json" },
+      })
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(`Delete  ALL operation failed. ${res.status}`);
+          } else {
+            console.log("All has been deleted successfully.");
+          }
+        })
+        .then(() => fetchData());
+    } catch (error) {
+      console.error("Error during Delete All operation:", error);
+      window.alert("An unexpected error occurred while deleting all items.");
+    }
   }
   // ----- HANDLERS -----
 
@@ -149,7 +171,7 @@ function Products() {
     setSelectedFiles(Array.from(e.target.files));
   };
 
-  function handleInputChange(e) {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
 
     setFormData((prevState) => ({
@@ -157,14 +179,13 @@ function Products() {
       [name]: value,
       availability: formData.kg !== "0",
     }));
-    console.log("AVAILABILITY", formData.availability);
-  }
+  };
 
-  function showDropDown() {
+  const showDropDown = () => {
     setActionDropDownShown((prev) => !prev);
-  }
+  };
 
-  function handleOptionChange(e) {
+  const handleOptionChange = (e) => {
     const selectedOption = e.target.value;
 
     if (selectedOption === "Delete") {
@@ -172,14 +193,18 @@ function Products() {
     } else if (selectedOption === "Delete All") {
       handleDeleteAll();
     }
-  }
+  };
 
-  function handleCheckedChange() {
+  const handleCheckedChange = () => {
     // remove from/add to the checked array
     setCheckedItems((prev) => !prev);
-  }
+  };
 
   // function checkedAll() {}
+
+  const handleLoadMore = () => {
+    if (productsLoaded < totalProducts) setPage((prevPage) => prevPage + 1);
+  };
 
   return (
     <>
@@ -314,6 +339,13 @@ function Products() {
               ))}
             </tbody>
           </table>
+        )}
+        <aside></aside>
+        {pageLoading && <span>Loading...</span>}
+        {!pageLoading && productsLoaded < totalProducts && (
+          <button onClick={handleLoadMore} disabled={pageLoading}>
+            Load More
+          </button>
         )}
       </main>
     </>

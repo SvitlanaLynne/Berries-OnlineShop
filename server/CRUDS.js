@@ -20,15 +20,24 @@ const connect = await connectDB();
 const multerStorage = multer.memoryStorage();
 const multerUpload = multer({ storage: multerStorage });
 
-const fire = initializeApp(firebaseConfig);
+const fireConfig = initializeApp(firebaseConfig);
 console.log("Collection Name:", Berry.collection.name);
 
 // ----- GET -----
 
 router.get("/products", async (req, res) => {
-  const allProducts = await Berry.find();
   try {
-    res.send(allProducts).status(204);
+    const page = parseInt(req.query.page) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 2;
+
+    const totalProducts = await Berry.countDocuments();
+
+    const allProducts = await Berry.find()
+      .skip((page - 1) * pageSize)
+      .limit(pageSize);
+
+    res.send({ data: allProducts, total: totalProducts }).status(200);
+    console.log(`page No. ${page} is requested`);
     console.log("\nAll products found successfully");
   } catch (error) {
     console.log("Error while getting the products from DB:", error);
@@ -38,7 +47,7 @@ router.get("/products", async (req, res) => {
 
 // ----- UPLOAD IMAGES -----
 
-const storage = getStorage(fire);
+const storage = getStorage(fireConfig);
 const storageRef = ref(storage); // points to the root of the Cloud Storage bucket.
 const folderRef = ref(storage, "images"); // points to 'images' folder.
 
