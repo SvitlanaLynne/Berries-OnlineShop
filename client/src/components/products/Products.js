@@ -9,10 +9,12 @@ function Products() {
   const [pageSize, setPageSize] = useState(2);
   const [totalProducts, setTotalProducts] = useState(0);
   const [productsLoaded, setProductsLoaded] = useState(0);
-  const [formRendered, setFormRendered] = useState(false);
+  const [formShown, setFormShown] = useState(false);
   const [actionDropDownShown, setActionDropDownShown] = useState(false);
+  const [importShown, setImportShown] = useState(false);
   const [checkedItems, setCheckedItems] = useState([]);
-  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [selectedCSV, setSelectedCSV] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     availability: true,
@@ -49,18 +51,18 @@ function Products() {
     fetchData();
   }, [fetchData]);
 
-  // ----- HIDE/SHOW the form -----
+  // ----- HIDE/SHOW elements -----
   useEffect(() => {
-    function hideForm(e) {
+    const hideForm = (e) => {
       const isAddProductButton =
-        e.target === document.querySelector("#addProductButton") ||
-        document.querySelector("#addProductButton").contains(e.target);
+        e.target === document.querySelector("#add-product-button") ||
+        document.querySelector("#add-product-button").contains(e.target);
 
-      if (formRendered && !e.target.closest("table") && !isAddProductButton) {
-        setFormRendered(false);
+      if (formShown && !e.target.closest("table") && !isAddProductButton) {
+        setFormShown(false);
       }
-    }
-    function hideActionDropDown(e) {
+    };
+    const hideActionDropDown = (e) => {
       const isActionButtonGroup =
         e.target === document.querySelector("#action-button-group") ||
         document.querySelector("#action-button-group").contains(e.target);
@@ -68,31 +70,52 @@ function Products() {
       if (actionDropDownShown && !isActionButtonGroup) {
         setActionDropDownShown(false);
       }
-    }
+    };
 
-    if (formRendered) {
+    const hideImport = (e) => {
+      const isImport =
+        e.target === document.querySelector("#import-button") ||
+        document.querySelector("#import-button").contains(e.target);
+
+      const isChildButtons = e.target.closest("#import-options-group");
+
+      if (importShown && !isImport && !isChildButtons) {
+        setImportShown(false);
+      }
+    };
+
+    if (formShown) {
       document.addEventListener("click", hideForm); // only listen if form is rendered
     }
     if (actionDropDownShown) {
       document.addEventListener("click", hideActionDropDown); // only listen if options are rendered
     }
+    if (importShown) {
+      document.addEventListener("click", hideImport); // only listen if Import options are shown
+    }
 
     return () => {
       document.removeEventListener("click", hideForm);
       document.removeEventListener("click", hideActionDropDown); // clean up listeners
+      document.removeEventListener("click", hideImport);
     };
-  }, [formRendered, actionDropDownShown]);
+  }, [formShown, actionDropDownShown, importShown]);
 
   const addForm = (e) => {
     e.stopPropagation(); // Stop the click event from reaching the document when "Add Product" is clicked
-    setFormRendered((prevRendered) => !prevRendered);
+    setFormShown((prevDisplay) => !prevDisplay);
   };
-  // ----- UPLOAD PRODUCT AND IMAGES -----
+
+  const addImportOptions = (e) => {
+    e.stopPropagation();
+    setImportShown((prevDisplay) => !prevDisplay);
+  };
+  // ----- INSERT ONE PRODUCT WITH IMAGES -----
   const handleProductUpload = async () => {
     try {
       const formDataWithImages = new FormData();
 
-      selectedFiles.forEach((file) => {
+      selectedImages.forEach((file) => {
         formDataWithImages.append("images", file);
       });
 
@@ -117,10 +140,35 @@ function Products() {
 
       console.log("Form and images submitted successfully");
       await fetchData();
-      await setSelectedFiles([]);
+      await setSelectedImages([]);
     } catch (error) {
       console.error("An unexpected error occurred:", error);
       window.alert("An unexpected error occurred. Please try again later.");
+    }
+  };
+
+  // ----- INSERT MANY FROM FILE -----
+  const importProductsFromFile = async () => {
+    try {
+      const serverResponse = await fetch(`${Url}/import/products`, {
+        method: "POST",
+        body: selectedCSV,
+      });
+
+      if (!serverResponse.ok) {
+        const errorMessage = await serverResponse.text();
+        console.error(
+          `Error during form and image upload. Status: ${serverResponse.status}, Message: ${errorMessage}`
+        );
+        window.alert(errorMessage);
+        return;
+      }
+      await setSelectedCSV([]);
+    } catch (error) {
+      console.log("Error while uploading file to the server", error);
+      window.alert(
+        "Error while uploading file to the server. Please try again later."
+      );
     }
   };
 
@@ -168,7 +216,10 @@ function Products() {
   // ----- HANDLERS -----
 
   const handleImagesSelection = (e) => {
-    setSelectedFiles(Array.from(e.target.files));
+    setSelectedImages(Array.from(e.target.files));
+  };
+  const handleCSVSelection = (e) => {
+    setSelectedCSV(Array.from(e.target.files));
   };
 
   const handleInputChange = (e) => {
@@ -209,7 +260,18 @@ function Products() {
   return (
     <>
       {/* ---------- import bar ---------- */}
-      <ImportBar addForm={addForm} />
+
+      <ImportBar addForm={addForm} addImportOptions={addImportOptions} />
+      {importShown === true ? (
+        <div id="import-options-group">
+          <button onClick={importProductsFromFile}>
+            Import Products from File
+          </button>
+          <button>Bulk Add Images</button>
+        </div>
+      ) : (
+        ""
+      )}
 
       <main id="Products-Container">
         {/* ---------- filters ---------- */}
@@ -249,7 +311,7 @@ function Products() {
               </tr>
             </thead>
             <tbody>
-              {formRendered === true ? (
+              {formShown === true ? (
                 <tr id="form">
                   {/* ---------- form ---------- */}
                   <td>-</td>

@@ -11,6 +11,7 @@ import {
   deleteObject,
 } from "firebase/storage";
 import multer from "multer";
+import csvParser from "csv-parser";
 // import { Promise } from "mongoose";
 
 // ----- FOR CRUDS: EXPRESS ROUTER(ENDPOINTS), MULTER, DB CONNECTION, FIREBASE -----
@@ -23,7 +24,7 @@ const multerUpload = multer({ storage: multerStorage });
 const fireConfig = initializeApp(firebaseConfig);
 console.log("Collection Name:", Berry.collection.name);
 
-// ----- GET -----
+// ----- GET PAGE(S) -----
 
 router.get("/products", async (req, res) => {
   try {
@@ -45,7 +46,7 @@ router.get("/products", async (req, res) => {
   }
 });
 
-// ----- UPLOAD IMAGES -----
+// ----- INSERT ONE WITH IMAGES -----
 
 const storage = getStorage(fireConfig);
 const storageRef = ref(storage); // points to the root of the Cloud Storage bucket.
@@ -111,10 +112,38 @@ router.post(
   }
 );
 
+// ----- INSERT MANY FROM FILE -----
+
+router.post("/import/products", multerUpload.single("file"), (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).send("No files reached the server.");
+    }
+    const fileInBuffer = req.file.buffer;
+    console.log("\nfileInBuffer", fileInBuffer);
+
+    const productsDataArr = [];
+    csvParser({ headers: true })
+      .on("data", (data) => productsDataArr.push(data))
+      .on("end", () => {
+        // Call a function to save data to MongoDB using Mongoose
+        // saveToMongoDB(results);
+
+        res.send("File uploaded and processed successfully.");
+      })
+      .write(fileInBuffer);
+  } catch (error) {
+    console.log(
+      "Error while processing files by Multer or saving in the database:",
+      error
+    );
+    return res.status(500).send("Internal Server Error");
+  }
+});
 // ----- DELETE ALL ------
 
 router.delete("/All", async (req, res) => {
-  // IN MONGO
+  // ---- In Mongo ----
   try {
     await Berry.deleteMany({});
     res.status(204).send("\nIntire Collection was DELETED\n");
@@ -123,8 +152,7 @@ router.delete("/All", async (req, res) => {
     console.log("Error while deleteing All", error);
     res.status(500).send("Internal Server Error");
   }
-  // IN FIREBASE (IMAGES)
-  // --- List of images in the folder ---
+  // ---- In Firebase (IMAGES) using List ----
   listAll(folderRef)
     .then((res) => {
       res.prefixes.forEach((folderRef) => {
