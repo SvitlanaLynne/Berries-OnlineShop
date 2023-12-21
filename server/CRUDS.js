@@ -12,6 +12,7 @@ import {
 } from "firebase/storage";
 import multer from "multer";
 import csvParser from "csv-parser";
+import { Readable } from "stream";
 // import { Promise } from "mongoose";
 
 // ----- FOR CRUDS: EXPRESS ROUTER(ENDPOINTS), MULTER, DB CONNECTION, FIREBASE -----
@@ -116,22 +117,26 @@ router.post(
 
 router.post("/import/products", multerUpload.single("file"), (req, res) => {
   try {
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).send("No files reached the server.");
+    if (!req.file || req.file.length === 0) {
+      return res.status(400).send("CSV file did not reach the server.");
     }
     const fileInBuffer = req.file.buffer;
-    console.log("\nfileInBuffer", fileInBuffer);
+    console.log("file in the buffer");
+    const readableStream = Readable.from(fileInBuffer.toString());
 
     const productsDataArr = [];
-    csvParser({ headers: true })
+    readableStream
+      .pipe(csvParser({ headers: true }))
       .on("data", (data) => productsDataArr.push(data))
       .on("end", () => {
         // Call a function to save data to MongoDB using Mongoose
         // saveToMongoDB(results);
-
+        console.log(
+          "File uploaded and processed successfully. Products Arr:",
+          productsDataArr
+        );
         res.send("File uploaded and processed successfully.");
-      })
-      .write(fileInBuffer);
+      });
   } catch (error) {
     console.log(
       "Error while processing files by Multer or saving in the database:",

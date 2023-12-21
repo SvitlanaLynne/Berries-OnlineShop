@@ -1,3 +1,32 @@
+#main-Container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  outline: 2px solid rgb(255, 196, 78);
+}
+.modalWindow {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: fixed; /* prevent scrolling away*/
+
+  width: 40%;
+  height: 40%;
+  max-height: 600px;
+  background-color: rgba(25, 171, 224, 0.5);
+  z-index: 2;
+}
+.closeX {
+  width: 30px;
+  height: 30px;
+  background-color: blanchedalmond;
+  align-self: flex-end;
+  text-align: center;
+}
+
 #Products-Container {
   display: flex;
   flex-direction: column;

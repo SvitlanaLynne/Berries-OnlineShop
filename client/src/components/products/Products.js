@@ -148,22 +148,36 @@ function Products() {
   };
 
   // ----- INSERT MANY FROM FILE -----
+  const openUploadWindow = () => {
+    document.getElementById("fileUploadWindow").style.display = "flex";
+  };
+
+  const closeUploadWindow = () => {
+    document.getElementById("fileUploadWindow").style.display = "none";
+  };
+
   const importProductsFromFile = async () => {
     try {
+      // form with appended file
+      const formData = new FormData();
+      formData.append("file", selectedCSV[0]);
+
+      // post
       const serverResponse = await fetch(`${Url}/import/products`, {
         method: "POST",
-        body: selectedCSV,
+        body: formData,
       });
 
       if (!serverResponse.ok) {
         const errorMessage = await serverResponse.text();
         console.error(
-          `Error during form and image upload. Status: ${serverResponse.status}, Message: ${errorMessage}`
+          `Error during CSV file upload. Status: ${serverResponse.status}, Message: ${errorMessage}`
         );
         window.alert(errorMessage);
         return;
       }
       await setSelectedCSV([]);
+      closeUploadWindow();
     } catch (error) {
       console.log("Error while uploading file to the server", error);
       window.alert(
@@ -258,15 +272,13 @@ function Products() {
   };
 
   return (
-    <>
+    <div id="main-Container">
       {/* ---------- import bar ---------- */}
 
       <ImportBar addForm={addForm} addImportOptions={addImportOptions} />
       {importShown === true ? (
         <div id="import-options-group">
-          <button onClick={importProductsFromFile}>
-            Import Products from File
-          </button>
+          <button onClick={openUploadWindow}>Import Products from File</button>
           <button>Bulk Add Images</button>
         </div>
       ) : (
@@ -274,6 +286,20 @@ function Products() {
       )}
 
       <main id="Products-Container">
+        {/* // ----------a window appears ------------- */}
+        <div id="fileUploadWindow" className="modalWindow">
+          <span className="closeX" onClick={closeUploadWindow}>
+            &times;
+          </span>
+          <div>
+            <input
+              type="file"
+              accept=".csv"
+              onChange={handleCSVSelection}
+            ></input>
+            <button onClick={importProductsFromFile}>Upload</button>
+          </div>
+        </div>
         {/* ---------- filters ---------- */}
         <aside id="filters">Filter Block</aside>
 
@@ -410,7 +436,7 @@ function Products() {
           </button>
         )}
       </main>
-    </>
+    </div>
   );
 }
 
