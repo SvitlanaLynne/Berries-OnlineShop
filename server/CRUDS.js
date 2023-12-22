@@ -115,36 +115,66 @@ router.post(
 
 // ----- INSERT MANY FROM FILE -----
 
-router.post("/import/products", multerUpload.single("file"), (req, res) => {
-  try {
-    if (!req.file || req.file.length === 0) {
-      return res.status(400).send("CSV file did not reach the server.");
-    }
-    const fileInBuffer = req.file.buffer;
-    console.log("file in the buffer");
-    const readableStream = Readable.from(fileInBuffer.toString());
+router.post(
+  "/import/products",
+  multerUpload.single("file"),
+  async (req, res) => {
+    // --- to Multer Buffer ---
+    try {
+      if (!req.file || req.file.length === 0) {
+        return res.status(400).send("CSV file did not reach the server.");
+      }
+      const fileInBuffer = req.file.buffer;
+      console.log("file in the buffer");
 
-    const productsDataArr = [];
-    readableStream
-      .pipe(csvParser({ headers: true }))
-      .on("data", (data) => productsDataArr.push(data))
-      .on("end", () => {
-        // Call a function to save data to MongoDB using Mongoose
-        // saveToMongoDB(results);
-        console.log(
-          "File uploaded and processed successfully. Products Arr:",
-          productsDataArr
-        );
-        res.send("File uploaded and processed successfully.");
-      });
-  } catch (error) {
-    console.log(
-      "Error while processing files by Multer or saving in the database:",
-      error
-    );
-    return res.status(500).send("Internal Server Error");
+      // Parse and transform according to schema
+      const readableStream = Readable.from(fileInBuffer.toString());
+      let isFirstRow = true;
+      const productsDataArr = [];
+      readableStream
+        .pipe(csvParser({ headers: true }))
+        .on("data", (row) => {
+          if (isFirstRow) {
+            isFirstRow = false; // skip the first row with headers
+            return;
+          }
+          const transformedData = {
+            name: row._0,
+            availability: row._1 === "TRUE",
+            kg: parseInt(row._2),
+            price: parseInt(row._3),
+            images: [row._4],
+          };
+          productsDataArr.push(transformedData);
+        })
+        .on("end", async () => {
+          console.log("CSV file processing completed.");
+
+          // --- csv to MONGO DB ---
+          try {
+            const newProducts = await Berry.insertMany(productsDataArr);
+
+            // let ids = newProducts.insertedIds;
+            // console.log(
+            //   `${newProducts.insertedCount} documents were inserted.`
+            // );
+            // for (let id of Object.values(ids)) {
+            //   console.log(`Inserted a document with id ${id}`);
+            // }
+
+            res.send("File uploaded and processed successfully.");
+          } catch (error) {
+            console.log("Error while saving data to MongoDB:", error);
+            res.status(500).send("Internal Server Error");
+          }
+        });
+    } catch (error) {
+      console.log("Error while processing files by Multer or parsing:", error);
+      res.status(500).send("Internal Server Error");
+    }
   }
-});
+);
+
 // ----- DELETE ALL ------
 
 router.delete("/All", async (req, res) => {
