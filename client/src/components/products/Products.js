@@ -140,7 +140,7 @@ function Products() {
 
       console.log("Form and images submitted successfully");
       await fetchData();
-      await setSelectedImages([]);
+      setSelectedImages([]);
     } catch (error) {
       console.error("An unexpected error occurred:", error);
       window.alert("An unexpected error occurred. Please try again later.");
@@ -148,6 +148,7 @@ function Products() {
   };
 
   // ----- INSERT MANY FROM FILE -----
+  // ---- Upload Bulk Data from CSV  ----
   const openUploadWindow = () => {
     document.getElementById("fileUploadWindow").style.display = "flex";
   };
@@ -176,13 +177,53 @@ function Products() {
         window.alert(errorMessage);
         return;
       }
-      await setSelectedCSV([]);
+      setSelectedCSV([]);
       closeUploadWindow();
     } catch (error) {
       console.log("Error while uploading file to the server", error);
       window.alert(
         "Error while uploading file to the server. Please try again later."
       );
+    }
+  };
+
+  // ---- Upload Bulk Images  ----
+  const openUploadImagesWindow = () => {
+    document.getElementById("imagesUploadWindow").style.display = "flex";
+  };
+  const closeImagesUploadWindow = () => {
+    document.getElementById("imagesUploadWindow").style.display = "none";
+  };
+
+  const importBulkImages = async () => {
+    try {
+      const formDataWithImages = new FormData();
+
+      selectedImages.forEach((file) => {
+        formDataWithImages.append("images", file);
+      });
+
+      const serverResponse = await fetch(`${Url}/upload/bulk-images`, {
+        method: "POST",
+        body: formDataWithImages,
+      });
+
+      if (!serverResponse.ok) {
+        const errorMessage = await serverResponse.text();
+        console.error(
+          `Error while bulk upload of images. Status: ${serverResponse.status}, Message: ${errorMessage}`
+        );
+        window.alert(errorMessage);
+        return;
+      }
+
+      console.log("Bulk image import was successful");
+      await fetchData();
+      setSelectedImages([]);
+      closeImagesUploadWindow();
+    } catch (error) {
+      console.error("An unexpected error occurred:", error);
+      window.alert("An unexpected error occurred. Please try again later.");
     }
   };
 
@@ -279,7 +320,7 @@ function Products() {
       {importShown === true ? (
         <div id="import-options-group">
           <button onClick={openUploadWindow}>Import Products from File</button>
-          <button>Bulk Add Images</button>
+          <button onClick={openUploadImagesWindow}>Bulk Add Images</button>
         </div>
       ) : (
         ""
@@ -298,6 +339,20 @@ function Products() {
               onChange={handleCSVSelection}
             ></input>
             <button onClick={importProductsFromFile}>Upload</button>
+          </div>
+        </div>
+        {/* ------------- a window appears ------------- */}
+        <div id="imagesUploadWindow" className="modalWindow">
+          <span className="closeX" onClick={closeImagesUploadWindow}>
+            &times;
+          </span>
+          <div>
+            <input
+              type="file"
+              multiple
+              onChange={handleImagesSelection}
+            ></input>
+            <button onClick={importBulkImages}>Submit</button>
           </div>
         </div>
         {/* ---------- filters ---------- */}

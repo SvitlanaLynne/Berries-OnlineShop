@@ -13,7 +13,6 @@ import {
 import multer from "multer";
 import csvParser from "csv-parser";
 import { Readable } from "stream";
-// import { Promise } from "mongoose";
 
 // ----- FOR CRUDS: EXPRESS ROUTER(ENDPOINTS), MULTER, DB CONNECTION, FIREBASE -----
 
@@ -40,7 +39,6 @@ router.get("/products", async (req, res) => {
 
     res.send({ data: allProducts, total: totalProducts }).status(200);
     console.log(`page No. ${page} is requested`);
-    console.log("\nAll products found successfully");
   } catch (error) {
     console.log("Error while getting the products from DB:", error);
     res.status(500).send("Internal Server Error");
@@ -77,6 +75,12 @@ router.post(
     }
 
     // --- to FIREBASE ---
+    // data validation ....
+
+    //....
+
+    // https://firebase.google.com/docs/storage/security
+
     const promises = imageObjectsArr.map(async (imageObject) => {
       const eachImageRef = ref(storage, `images/${imageObject.originalname}`);
       const snapshot = await uploadBytes(eachImageRef, imageObject.data);
@@ -114,7 +118,7 @@ router.post(
 );
 
 // ----- INSERT MANY FROM FILE -----
-
+// ---- Upload Bulk Data from CSV  ----
 router.post(
   "/import/products",
   multerUpload.single("file"),
@@ -125,7 +129,6 @@ router.post(
         return res.status(400).send("CSV file did not reach the server.");
       }
       const fileInBuffer = req.file.buffer;
-      console.log("file in the buffer");
 
       // Parse and transform according to schema
       const readableStream = Readable.from(fileInBuffer.toString());
@@ -148,8 +151,6 @@ router.post(
           productsDataArr.push(transformedData);
         })
         .on("end", async () => {
-          console.log("CSV file processing completed.");
-
           // --- csv to MONGO DB ---
           try {
             const newProducts = await Berry.insertMany(productsDataArr);
@@ -161,7 +162,7 @@ router.post(
             // for (let id of Object.values(ids)) {
             //   console.log(`Inserted a document with id ${id}`);
             // }
-
+            console.log("CSV file is uploaded and processed successfully.");
             res.send("File uploaded and processed successfully.");
           } catch (error) {
             console.log("Error while saving data to MongoDB:", error);
@@ -170,6 +171,76 @@ router.post(
         });
     } catch (error) {
       console.log("Error while processing files by Multer or parsing:", error);
+      res.status(500).send("Internal Server Error");
+    }
+  }
+);
+
+// ---- Upload Bulk Images  ----
+router.post(
+  "/upload/bulk-images",
+  multerUpload.array("images", 15),
+  async (req, res) => {
+    let imageObjectsArr;
+
+    try {
+      if (!req.files || req.files.length === 0) {
+        return res
+          .status(400)
+          .send("No files reached the server during bulk import.");
+      }
+
+      imageObjectsArr = req.files.map((file) => ({
+        originalname: file.originalname,
+        data: file.buffer,
+        contentType: file.mimetype,
+      }));
+      res.status(200);
+    } catch (error) {
+      console.log("Error while importing images to Multer:", error);
+      return res.status(500).send("Internal Server Error");
+    }
+
+    // --- bulk images to FIREBASE ---
+    // data validation ....
+
+    //....
+
+    // https://firebase.google.com/docs/storage/security
+
+    const promises = imageObjectsArr.map(async (imageObject) => {
+      const eachImageRef = ref(storage, `images/${imageObject.originalname}`);
+      const snapshot = await uploadBytes(eachImageRef, imageObject.data);
+      return await getDownloadURL(snapshot.ref);
+    });
+
+    // --- bulk images to MONGO DB ---
+    try {
+      const imageURLs = await Promise.all(promises);
+
+      for (let i = 0; i < imageURLs.length; i++) {
+        const imageOriginalname = imageObjectsArr[i].originalname.split(".")[0];
+
+        const existingProduct = await Berry.findOne({
+          name: imageOriginalname,
+        });
+
+        if (!existingProduct) {
+          console.log(`Product with the name ${imageOriginalname} not found.`);
+          continue; // Skip to the next iteration
+        }
+
+        existingProduct.images = imageURLs[i]; // Update the product with the new image URL
+        await existingProduct.save();
+      }
+      console.log(
+        "\nSuccessful bulk image import. Links are added to the database."
+      );
+      res
+        .status(204)
+        .send("Links are added to the database. Successful bulk image import.");
+    } catch (error) {
+      console.log("Error while adding links to the database", error);
       res.status(500).send("Internal Server Error");
     }
   }
