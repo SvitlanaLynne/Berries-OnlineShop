@@ -39,17 +39,27 @@ function Products() {
       setTotalProducts(total);
       setProductsLoaded((prev) => prev + data.length);
       setData((prevData) => [...prevData, ...data]);
+      // setData(data);
     } catch (error) {
       window.alert("Unexpected error. Unable to reach the server.");
     } finally {
       setIsLoading(false);
       setPageLoading(false);
     }
-  }, [page, pageSize]);
+  }, [
+    page,
+    pageSize,
+    setTotalProducts,
+    setProductsLoaded,
+    setData,
+    setIsLoading,
+    setPageLoading,
+  ]);
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+    console.log("fetchData triggered");
+  }, [fetchData, page, pageSize]);
 
   // ----- HIDE/SHOW elements -----
   useEffect(() => {
@@ -139,6 +149,7 @@ function Products() {
       }
 
       console.log("Form and images submitted successfully");
+      setData([]);
       await fetchData();
       setSelectedImages([]);
     } catch (error) {
@@ -179,6 +190,8 @@ function Products() {
       }
       setSelectedCSV([]);
       closeUploadWindow();
+      setData([]);
+      fetchData();
     } catch (error) {
       console.log("Error while uploading file to the server", error);
       window.alert(
@@ -249,20 +262,20 @@ function Products() {
   }
 
   // ----- DELETE ALL -----
-  function handleDeleteAll() {
+  async function handleDeleteAll() {
     try {
-      fetch(Url + "/All", {
+      const response = await fetch(Url + "/All", {
         method: "DELETE",
-        Headers: { "Content-Type": "application/json" },
-      })
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error(`Delete  ALL operation failed. ${res.status}`);
-          } else {
-            console.log("All has been deleted successfully.");
-          }
-        })
-        .then(() => fetchData());
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Delete ALL operation failed. ${response.status}`);
+      }
+
+      console.log("All items have been deleted successfully.");
+      setPage(1);
+      setData([]);
     } catch (error) {
       console.error("Error during Delete All operation:", error);
       window.alert("An unexpected error occurred while deleting all items.");

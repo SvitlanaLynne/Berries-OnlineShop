@@ -33,11 +33,11 @@ router.get("/products", async (req, res) => {
 
     const totalProducts = await Berry.countDocuments();
 
-    const allProducts = await Berry.find()
+    const productsPortion = await Berry.find()
       .skip((page - 1) * pageSize)
       .limit(pageSize);
 
-    res.send({ data: allProducts, total: totalProducts }).status(200);
+    res.send({ data: productsPortion, total: totalProducts }).status(200);
     console.log(`page No. ${page} is requested`);
   } catch (error) {
     console.log("Error while getting the products from DB:", error);
@@ -59,7 +59,9 @@ router.post(
 
     try {
       if (!req.files || req.files.length === 0) {
-        return res.status(400).send("No files reached the server.");
+        return res
+          .status(400)
+          .send("No images to send. Please choose a picture.");
       }
 
       imageObjectsArr = req.files.map((file) => ({
@@ -265,7 +267,10 @@ router.delete("/All", async (req, res) => {
         console.log("Subdirectory found:", folderRef.name);
       });
       res.items.forEach((itemRef) => {
-        console.log("\nItems found in the folder:", itemRef.name);
+        console.log(
+          "\nList of all images in the Firebase before action:",
+          itemRef.name
+        );
       });
       const promisesToDelArr = res.items.map((item) => {
         return deleteObject(item); // delete() method returns promises
