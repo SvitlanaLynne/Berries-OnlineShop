@@ -47,16 +47,20 @@ router.get("/products", async (req, res) => {
   }
 });
 
-// ----- INSERT ONE WITH IMAGES -----
+// // ----- INSERT ONE WITH IMAGES -----
 
 const storage = getStorage(fireConfig);
 const storageRef = ref(storage); // points to the root of the Cloud Storage bucket.
 const folderRef = ref(storage, "images"); // points to 'images' folder.
 
-router.post(
-  "/upload/form",
-  multerUpload.array("images", 15),
-  async (req, res) => {
+// ---- to MULTER  ----
+const handleImagesUpload = (req, res, next) => {
+  multerUpload.array("images", 15)(req, res, async (error) => {
+    if (error) {
+      console.error("Multer error:", error);
+      return res.status(500).send("Internal Server Error");
+    }
+
     let imageObjectsArr;
 
     try {
@@ -74,16 +78,12 @@ router.post(
 
       res.status(200).send("Images in the Multer's buffer.");
     } catch (error) {
-      console.log("Error while processing Multer files:", error);
+      console.error("Error while processing Multer files:", error);
       return res.status(500).send("Internal Server Error");
     }
 
     // --- to FIREBASE ---
-    // data validation ....
-
-    //....
-
-    // https://firebase.google.com/docs/storage/security
+    // data validation ....https://firebase.google.com/docs/storage/security
 
     const promises = imageObjectsArr.map(async (imageObject) => {
       const eachImageRef = ref(storage, `images/${imageObject.originalname}`);
@@ -91,35 +91,42 @@ router.post(
       return await getDownloadURL(snapshot.ref);
     });
 
-    // --- data to MONGO DB ---
-    try {
-      const imageURLs = await Promise.all(promises);
-      const existingProduct = await Berry.findOne({ name: req.body.name });
+    // Attach promises to the request object
+    req.imageUploadPromises = promises;
 
-      if (existingProduct) {
-        console.log("Product with the same name already exists.");
-        return res
-          .status(400)
-          .send(
-            "Product with the same name already exists, hence your form was not submitted."
-          );
-      }
+    next();
+  });
+};
 
-      const newProduct = await Berry.create({
-        name: req.body.name,
-        availability: req.body.availability,
-        kg: req.body.kg,
-        price: req.body.price,
-        images: imageURLs,
-      });
-      res.status(204);
-      console.log("ONE NEW PRODUCT CREATED IN DB:", newProduct);
-    } catch (error) {
-      console.log("Error while inserting a product to DB:", error);
-      res.status(500).send("Internal Server Error");
+router.post("/upload/form", handleImagesUpload, async (req, res) => {
+  // --- data to MONGO DB ---
+  try {
+    const imageURLs = await Promise.all(req.imageUploadPromises);
+    const existingProduct = await Berry.findOne({ name: req.body.name });
+
+    if (existingProduct) {
+      console.log("Product with the same name already exists.");
+      return res
+        .status(400)
+        .send(
+          "Product with the same name already exists, hence your form was not submitted."
+        );
     }
+
+    const newProduct = await Berry.create({
+      name: req.body.name,
+      availability: req.body.availability,
+      kg: req.body.kg,
+      price: req.body.price,
+      images: imageURLs,
+    });
+    res.status(204);
+    console.log("ONE NEW PRODUCT CREATED IN DB:", newProduct);
+  } catch (error) {
+    console.log("Error while inserting a product to DB:", error);
+    res.status(500).send("Internal Server Error");
   }
-);
+});
 
 // ----- INSERT MANY FROM FILE -----
 // ---- Upload Bulk Data from CSV  ----
@@ -249,6 +256,31 @@ router.post(
     }
   }
 );
+
+// ----- EDIT ONE -----
+
+router.patch(`/product/:${productId}`, handleImagesUpload, async (req, res) => {
+  const productId = req.params.productId;
+  // --- data to MONGO DB ---
+  try {
+    const imageURLs = await Promise.all(req.imageUploadPromises);
+
+    const ProductToUpdate = await Berry.findOne({ id: productId });
+
+    const newProduct = await Berry.create({
+      name: req.body.name,
+      availability: req.body.availability,
+      kg: req.body.kg,
+      price: req.body.price,
+      images: imageURLs,
+    });
+    res.status(204);
+    console.log("ONE NEW PRODUCT CREATED IN DB:", newProduct);
+  } catch (error) {
+    console.log("Error while inserting a product to DB:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 // ----- DELETE ALL ------
 

@@ -127,6 +127,7 @@ function Products() {
     e.stopPropagation();
     setImportShown((prevDisplay) => !prevDisplay);
   };
+
   // ----- INSERT ONE PRODUCT WITH IMAGES -----
   const handleProductUpload = async (productId) => {
     try {
@@ -244,6 +245,48 @@ function Products() {
     } catch (error) {
       console.error("An unexpected error occurred:", error);
       window.alert("An unexpected error occurred. Please try again later.");
+    }
+  };
+
+  // ----- EDIT ONE  -----
+  const handleProductEdit = async (productId) => {
+    try {
+      const formData = new FormData();
+
+      // Append images if they exist
+      if (selectedImages.length > 0) {
+        selectedImages.forEach((file) => {
+          formData.append("images", file);
+        });
+      }
+
+      // Append form data
+      for (const key in editFormData) {
+        formData.append(key, editFormData[key]);
+      }
+
+      const serverResponse = await fetch(`${Url}/product/:${productId}`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!serverResponse.ok) {
+        const errorMessage = await serverResponse.text();
+        console.error(
+          `Error during editing. Status: ${serverResponse.status}, Message: ${errorMessage}`
+        );
+        window.alert(errorMessage);
+        return;
+      }
+
+      console.log("Edited data submitted successfully");
+    } catch (error) {
+      console.error("An unexpected error occurred:", error);
+      window.alert("An unexpected error occurred. Please try again later.");
+    } finally {
+      setData([]);
+      await fetchData();
+      setSelectedImages([]);
     }
   };
 
@@ -527,7 +570,7 @@ function Products() {
                       />
                     </td>
                     <td>
-                      <button onClick={() => handleProductUpload(product._id)}>
+                      <button onClick={handleProductEdit(product._id)}>
                         Submit
                       </button>
                       <button onClick={() => setIsEditing(null)}>Cancel</button>
