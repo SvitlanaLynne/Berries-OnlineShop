@@ -16,6 +16,12 @@ function Products() {
   const [selectedImages, setSelectedImages] = useState([]);
   const [selectedCSV, setSelectedCSV] = useState([]);
   const [isEditing, setIsEditing] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    availability: true,
+    kg: "",
+    price: "",
+  });
   const [formData, setFormData] = useState({
     name: "",
     availability: true,
@@ -300,15 +306,24 @@ function Products() {
       availability: formData.kg !== "0",
     }));
   };
-
-  const handleEdit = (e, productId) => {
+  const handleEditChange = (e) => {
     const { name, value } = e.target;
 
-    setFormData((prevState) => ({
+    setEditFormData((prevState) => ({
       ...prevState,
       [name]: value,
       availability: formData.kg !== "0",
     }));
+  };
+
+  const handleEdit = (productId) => {
+    const productToEdit = data.find((product) => product._id === productId);
+
+    setEditFormData({
+      name: productToEdit.name,
+      kg: productToEdit.kg,
+      price: productToEdit.price,
+    });
 
     setIsEditing(productId);
   };
@@ -428,7 +443,6 @@ function Products() {
                       multiple
                       onChange={handleImagesSelection}
                     ></input>
-                    {/* <button onClick={handleImagesUpload}>Add picture</button> */}
                   </td>
                   <td>
                     <input
@@ -471,96 +485,94 @@ function Products() {
               )}
 
               {/* ---------- products ---------- */}
-              {data.map((product) => (
-                <div key={product.id}>
-                  {isEditing === product.id ? (
-                    <tr id="form">
-                      {/* ---------- inline form ---------- */}
-                      <td>-</td>
-                      <td>
+              {data.map((product) => {
+                // console.log("PRODUCT ID", product._id);
+                return isEditing === product._id ? (
+                  <tr key={product._id} id="form">
+                    {/* ---------- inline form ---------- */}
+                    <td>-</td>
+                    <td>
+                      <input
+                        type="file"
+                        multiple
+                        onChange={handleEditChange}
+                      ></input>
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        name="name"
+                        value={editFormData.name}
+                        onChange={handleEditChange}
+                        required
+                      />
+                    </td>
+                    <td>In Stock status</td>
+                    <td>
+                      <input
+                        type="number"
+                        name="kg"
+                        value={editFormData.kg}
+                        onChange={handleEditChange}
+                        required
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        name="price"
+                        value={editFormData.price}
+                        onChange={handleEditChange}
+                        required
+                      />
+                    </td>
+                    <td>
+                      <button onClick={() => handleProductUpload(product._id)}>
+                        Submit
+                      </button>
+                      <button onClick={() => setIsEditing(null)}>Cancel</button>
+                    </td>
+                  </tr>
+                ) : (
+                  //  ---------- non-edited items ----------
+                  <tr key={product._id}>
+                    <td>
+                      <div id="check-box-group">
                         <input
-                          type="file"
-                          multiple
-                          onChange={handleImagesSelection}
-                        ></input>
-                      </td>
-                      <td>
-                        <input
-                          type="text"
-                          name="name"
-                          value={product.name}
-                          onChange={(e) => handleEdit(e, product.id)}
-                          required
+                          type="checkbox"
+                          checked={checkedItems.includes(product._id)}
+                          onChange={() => handleCheckedChange(product._id)}
                         />
-                      </td>
-                      <td>In Stock status</td>
-                      <td>
-                        <input
-                          type="number"
-                          name="kg"
-                          value={product.kg}
-                          onChange={(e) => handleEdit(e, product.id)}
-                          required
+                      </div>
+                    </td>
+                    <td>
+                      {product.images.map((imgUrl, index) => (
+                        <img
+                          key={`${product._id}-${index}`}
+                          src={imgUrl}
+                          alt={`${product.name} ${index + 1}`}
                         />
-                      </td>
-                      <td>
-                        <input
-                          type="number"
-                          name="price"
-                          value={product.price}
-                          onChange={(e) => handleEdit(e, product.id)}
-                          required
-                        />
-                      </td>
-                      <td>
-                        <button onClick={() => handleProductUpload(product.id)}>
-                          Submit
-                        </button>
-                        <button onClick={() => setIsEditing(null)}>
-                          Cancel
-                        </button>
-                      </td>
-                    </tr>
-                  ) : (
-                    <tr>
-                      <td>
-                        <div id="check-box-group">
-                          <input
-                            type="checkbox"
-                            checked={checkedItems.includes(product.id)}
-                            onChange={() => handleCheckedChange(product.id)}
-                          />
-                        </div>
-                      </td>
-                      <td>
-                        {product.images.map((imgUrl, index) => (
-                          <img
-                            key={`${product.id}-${index}`}
-                            src={imgUrl}
-                            alt={`${product.name} ${index + 1}`}
-                          />
-                        ))}
-                      </td>
-                      <td>{product.name}</td>
-                      <td>
-                        {product.availability === true ? (
-                          <span>Available</span>
-                        ) : (
-                          <span>Out of Stock</span>
-                        )}
-                      </td>
-                      <td>{product.kg}</td>
-                      <td>{product.price}</td>
-                      <td>
-                        <button onClick={(e) => handleEdit(e, product.id)}>
-                          Edit
-                        </button>
-                        <button>Delete</button>
-                      </td>
-                    </tr>
-                  )}
-                </div>
-              ))}
+                      ))}
+                    </td>
+                    <td>{product.name}</td>
+                    <td>
+                      {product.availability === true ? (
+                        <span>Available</span>
+                      ) : (
+                        <span>Out of Stock</span>
+                      )}
+                    </td>
+                    <td>{product.kg}</td>
+                    <td>{product.price}</td>
+                    <td>
+                      <button onClick={() => handleEdit(product._id)}>
+                        Edit
+                      </button>
+                      <button>Delete</button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
