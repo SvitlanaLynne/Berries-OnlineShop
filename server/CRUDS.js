@@ -21,8 +21,6 @@ const connect = await connectDB();
 const multerStorage = multer.memoryStorage();
 const multerUpload = multer({ storage: multerStorage });
 
-
-
 const fireConfig = initializeApp(firebaseConfig);
 console.log("Collection Name:", Berry.collection.name);
 
@@ -53,7 +51,8 @@ const storage = getStorage(fireConfig);
 const storageRef = ref(storage); // points to the root of the Cloud Storage bucket.
 const folderRef = ref(storage, "images"); // points to 'images' folder.
 
-// ---- to MULTER  ----
+// ---- IMAGES ----
+// --- to MULTER  ---
 const handleImagesUpload = (req, res, next) => {
   multerUpload.array("images", 15)(req, res, async (error) => {
     if (error) {
@@ -188,96 +187,92 @@ router.post(
 );
 
 // ---- Upload Bulk Images  ----
-router.post(
-  "/upload/bulk-images",
-  multerUpload.array("images", 15),
-  async (req, res) => {
-    let imageObjectsArr;
-
-    try {
-      if (!req.files || req.files.length === 0) {
-        return res
-          .status(400)
-          .send("No files reached the server during bulk import.");
-      }
-
-      imageObjectsArr = req.files.map((file) => ({
-        originalname: file.originalname,
-        data: file.buffer,
-        contentType: file.mimetype,
-      }));
-      res.status(200);
-    } catch (error) {
-      console.log("Error while importing images to Multer:", error);
-      return res.status(500).send("Internal Server Error");
-    }
-
-    // --- bulk images to FIREBASE ---
-    // data validation ....
-
-    //....
-
-    // https://firebase.google.com/docs/storage/security
-
-    const promises = imageObjectsArr.map(async (imageObject) => {
-      const eachImageRef = ref(storage, `images/${imageObject.originalname}`);
-      const snapshot = await uploadBytes(eachImageRef, imageObject.data);
-      return await getDownloadURL(snapshot.ref);
-    });
-
-    // --- bulk images to MONGO DB ---
-    try {
-      const imageURLs = await Promise.all(promises);
-
-      for (let i = 0; i < imageURLs.length; i++) {
-        const imageOriginalname = imageObjectsArr[i].originalname.split(".")[0];
-
-        const existingProduct = await Berry.findOne({
-          name: imageOriginalname,
-        });
-
-        if (!existingProduct) {
-          console.log(`Product with the name ${imageOriginalname} not found.`);
-          continue; // Skip to the next iteration
-        }
-
-        existingProduct.images = imageURLs[i]; // Update the product with the new image URL
-        await existingProduct.save();
-      }
-      console.log(
-        "\nSuccessful bulk image import. Links are added to the database."
-      );
-      res
-        .status(204)
-        .send("Links are added to the database. Successful bulk image import.");
-    } catch (error) {
-      console.log("Error while adding links to the database", error);
-      res.status(500).send("Internal Server Error");
-    }
-  }
-);
-
-// ----- EDIT ONE -----
-
-router.patch(`/product/:${productId}`, handleImagesUpload, async (req, res) => {
-  const productId = req.params.productId;
-  // --- data to MONGO DB ---
+router.post("/upload/bulk-images", handleImagesUpload, async (req, res) => {
+  // --- bulk images to MONGO DB ---
   try {
     const imageURLs = await Promise.all(req.imageUploadPromises);
 
-    const ProductToUpdate = await Berry.findOne({ id: productId });
+    for (let i = 0; i < imageURLs.length; i++) {
+      const imageOriginalname = imageObjectsArr[i].originalname.split(".")[0];
 
-    const newProduct = await Berry.create({
-      name: req.body.name,
-      availability: req.body.availability,
-      kg: req.body.kg,
-      price: req.body.price,
-      images: imageURLs,
-    });
-    res.status(204);
-    console.log("ONE NEW PRODUCT CREATED IN DB:", newProduct);
+      const existingProduct = await Berry.findOne({
+        name: imageOriginalname,
+      });
+
+      if (!existingProduct) {
+        console.log(`Product with the name ${imageOriginalname} not found.`);
+        window.alert(`Product with the name ${imageOriginalname} not found. `);
+        continue; // Skip to the next iteration
+      }
+
+      existingProduct.images = imageURLs[i]; // Update the product with the new image URL
+      await existingProduct.save();
+    }
+    console.log(
+      "\nSuccessful bulk image import. Links are added to the database."
+    );
+    res
+      .status(204)
+      .send("Links are added to the database. Successful bulk image import.");
   } catch (error) {
-    console.log("Error while inserting a product to DB:", error);
+    console.log("Error while adding links to the database", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// ----- EDIT ONE -----
+
+router.patch(`/product/:productId`, async (req, res) => {
+  const productId = req.params.productId;
+  console.log("Received PATCH request for product:", productId);
+
+  try {
+    // Check if images were uploaded
+    if (req.files && req.files.length !== 0) {
+      await handleImagesUpload(req, res);
+
+      const imageURLs = await Promise.all(req.imageUploadPromises);
+
+      // Update product with images
+      await Berry.findOneAndUpdate(
+        { _id: productId },
+        {
+          $set: {
+            name: req.body.name,
+            availability: req.body.availability,
+            kg: req.body.kg,
+            price: req.body.price,
+            images: imageURLs[0],
+          },
+        }
+      );
+    } else {
+      // Update product without images
+      await Berry.findOneAndUpdate(
+        { _id: productId },
+        {
+          $set: {
+            name: req.body.name,
+            availability: req.body.availability,
+            kg: req.body.kg,
+            price: req.body.price,
+          },
+        }
+      );
+    }
+
+    // Fetch the updated product for logging
+    const updatedProduct = await Berry.findById(productId);
+
+    if (!updatedProduct) {
+      console.log("Product not found");
+      return res.status(404).send("Product not found");
+    }
+
+    console.log(`UPDATED the ${updatedProduct.name}`);
+    res.status(204).send();
+  } catch (error) {
+    console.log("Error while updating:", error);
     res.status(500).send("Internal Server Error");
   }
 });

@@ -249,6 +249,29 @@ function Products() {
   };
 
   // ----- EDIT ONE  -----
+
+  const enableEdit = (productId) => {
+    const productToEdit = data.find((product) => product._id === productId);
+
+    setEditFormData({
+      name: productToEdit.name,
+      kg: productToEdit.kg,
+      price: productToEdit.price,
+    });
+
+    setIsEditing(productId);
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+
+    setEditFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+      availability: formData.kg !== "0",
+    }));
+  };
+
   const handleProductEdit = async (productId) => {
     try {
       const formData = new FormData();
@@ -261,12 +284,13 @@ function Products() {
       }
 
       // Append form data
+      formData.append("_Id", productId);
       for (const key in editFormData) {
         formData.append(key, editFormData[key]);
       }
 
-      const serverResponse = await fetch(`${Url}/product/:${productId}`, {
-        method: "POST",
+      const serverResponse = await fetch(`${Url}/product/${productId}`, {
+        method: "PATCH",
         body: formData,
       });
 
@@ -279,7 +303,7 @@ function Products() {
         return;
       }
 
-      console.log("Edited data submitted successfully");
+      console.log("Submitted data for the update", formData);
     } catch (error) {
       console.error("An unexpected error occurred:", error);
       window.alert("An unexpected error occurred. Please try again later.");
@@ -287,6 +311,7 @@ function Products() {
       setData([]);
       await fetchData();
       setSelectedImages([]);
+      setIsEditing(null);
     }
   };
 
@@ -349,27 +374,6 @@ function Products() {
       availability: formData.kg !== "0",
     }));
   };
-  const handleEditChange = (e) => {
-    const { name, value } = e.target;
-
-    setEditFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-      availability: formData.kg !== "0",
-    }));
-  };
-
-  const handleEdit = (productId) => {
-    const productToEdit = data.find((product) => product._id === productId);
-
-    setEditFormData({
-      name: productToEdit.name,
-      kg: productToEdit.kg,
-      price: productToEdit.price,
-    });
-
-    setIsEditing(productId);
-  };
 
   const showDropDown = () => {
     setActionDropDownShown((prev) => !prev);
@@ -396,6 +400,8 @@ function Products() {
     if (productsLoaded < totalProducts) setPage((prevPage) => prevPage + 1);
   };
 
+  //------ RETURN ------
+
   return (
     <div id="main-Container">
       {/* ---------- import bar ---------- */}
@@ -403,8 +409,12 @@ function Products() {
       <ImportBar addForm={addForm} addImportOptions={addImportOptions} />
       {importShown === true ? (
         <div id="import-options-group">
-          <button onClick={openUploadWindow}>Import Products from File</button>
-          <button onClick={openUploadImagesWindow}>Bulk Add Images</button>
+          <button onClick={() => openUploadWindow()}>
+            Import Products from File
+          </button>
+          <button onClick={() => openUploadImagesWindow()}>
+            Bulk Add Images
+          </button>
         </div>
       ) : (
         ""
@@ -413,7 +423,7 @@ function Products() {
       <main id="Products-Container">
         {/* // ----------a window appears ------------- */}
         <div id="fileUploadWindow" className="modalWindow">
-          <span className="closeX" onClick={closeUploadWindow}>
+          <span className="closeX" onClick={() => closeUploadWindow()}>
             &times;
           </span>
           <div>
@@ -422,12 +432,12 @@ function Products() {
               accept=".csv"
               onChange={handleCSVSelection}
             ></input>
-            <button onClick={importProductsFromFile}>Upload</button>
+            <button onClick={() => importProductsFromFile()}>Upload</button>
           </div>
         </div>
         {/* ------------- a window appears ------------- */}
         <div id="imagesUploadWindow" className="modalWindow">
-          <span className="closeX" onClick={closeImagesUploadWindow}>
+          <span className="closeX" onClick={() => closeImagesUploadWindow()}>
             &times;
           </span>
           <div>
@@ -436,7 +446,7 @@ function Products() {
               multiple
               onChange={handleImagesSelection}
             ></input>
-            <button onClick={importBulkImages}>Submit</button>
+            <button onClick={() => importBulkImages()}>Submit</button>
           </div>
         </div>
         {/* ---------- filters ---------- */}
@@ -454,7 +464,7 @@ function Products() {
                 </th>
                 <th>
                   <div id="action-button-group">
-                    <label id="action-button" onClick={showDropDown}>
+                    <label id="action-button" onClick={() => showDropDown()}>
                       Action
                     </label>
                     {actionDropDownShown ? (
@@ -519,7 +529,9 @@ function Products() {
                     />
                   </td>
                   <td>
-                    <button onClick={handleProductUpload}>Submit</button>
+                    <button onClick={() => handleProductUpload()}>
+                      Submit
+                    </button>
                     <button onClick={() => setFormShown(false)}>Cancel</button>
                   </td>
                 </tr>
@@ -570,7 +582,7 @@ function Products() {
                       />
                     </td>
                     <td>
-                      <button onClick={handleProductEdit(product._id)}>
+                      <button onClick={() => handleProductEdit(product._id)}>
                         Submit
                       </button>
                       <button onClick={() => setIsEditing(null)}>Cancel</button>
@@ -608,7 +620,7 @@ function Products() {
                     <td>{product.kg}</td>
                     <td>{product.price}</td>
                     <td>
-                      <button onClick={() => handleEdit(product._id)}>
+                      <button onClick={() => enableEdit(product._id)}>
                         Edit
                       </button>
                       <button>Delete</button>
@@ -622,7 +634,7 @@ function Products() {
         <aside></aside>
         {pageLoading && <span>Loading...</span>}
         {!pageLoading && productsLoaded < totalProducts && (
-          <button onClick={handleLoadMore} disabled={pageLoading}>
+          <button onClick={() => handleLoadMore()} disabled={pageLoading}>
             Load More
           </button>
         )}
