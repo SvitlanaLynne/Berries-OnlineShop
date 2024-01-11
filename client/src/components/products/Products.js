@@ -275,18 +275,23 @@ function Products() {
   const handleProductEdit = async (productId) => {
     try {
       const formData = new FormData();
+      // Append form data
+      formData.append("_id", productId);
+      for (const key in editFormData) {
+        formData.append(key, editFormData[key]);
+      }
 
-      // Append images if they exist
+      // Append images
       if (selectedImages.length > 0) {
-        selectedImages.forEach((file) => {
-          formData.append("images", file);
+        selectedImages.forEach((file, index) => {
+          // Append each file with the same key "images"
+          formData.append("images", file, `image${index}`);
         });
       }
 
-      // Append form data
-      formData.append("_Id", productId);
-      for (const key in editFormData) {
-        formData.append(key, editFormData[key]);
+      // console FormData
+      for (const [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
       }
 
       const serverResponse = await fetch(`${Url}/product/${productId}`, {

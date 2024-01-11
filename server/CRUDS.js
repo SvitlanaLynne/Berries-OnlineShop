@@ -222,41 +222,37 @@ router.post("/upload/bulk-images", handleImagesUpload, async (req, res) => {
 
 // ----- EDIT ONE -----
 
-router.patch(`/product/:productId`, async (req, res) => {
+router.patch(`/product/:productId`, multerUpload.none(), async (req, res) => {
   const productId = req.params.productId;
-  console.log("Received PATCH request for product:", productId);
+  console.log("REQ.BODY", req.body);
 
   try {
-    // Check if images were uploaded
     if (req.files && req.files.length !== 0) {
-      await handleImagesUpload(req, res);
+      await handleImagesUpload(req, res, next);
 
       const imageURLs = await Promise.all(req.imageUploadPromises);
 
-      // Update product with images
+      // Update with images
       await Berry.findOneAndUpdate(
         { _id: productId },
         {
-          $set: {
-            name: req.body.name,
-            availability: req.body.availability,
-            kg: req.body.kg,
-            price: req.body.price,
-            images: imageURLs[0],
-          },
+          name: req.body.name,
+          availability: req.body.availability,
+          kg: req.body.kg,
+          price: req.body.price,
+          images: imageURLs[0],
         }
       );
     } else {
-      // Update product without images
+      // Update without images
+      console.log("NAME in the req body to db", req.body.name);
       await Berry.findOneAndUpdate(
         { _id: productId },
         {
-          $set: {
-            name: req.body.name,
-            availability: req.body.availability,
-            kg: req.body.kg,
-            price: req.body.price,
-          },
+          name: req.body.name,
+          availability: req.body.availability,
+          kg: req.body.kg,
+          price: req.body.price,
         }
       );
     }
@@ -269,7 +265,7 @@ router.patch(`/product/:productId`, async (req, res) => {
       return res.status(404).send("Product not found");
     }
 
-    console.log(`UPDATED the ${updatedProduct.name}`);
+    console.log(`UPDATED ${req.body.name}`);
     res.status(204).send();
   } catch (error) {
     console.log("Error while updating:", error);
