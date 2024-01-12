@@ -129,8 +129,9 @@ function Products() {
   };
 
   // ----- INSERT ONE PRODUCT WITH IMAGES -----
-  const handleProductUpload = async (productId) => {
+  const handleProductUpload = async () => {
     try {
+      // Append images
       const formDataWithImages = new FormData();
 
       selectedImages.forEach((file) => {
@@ -275,18 +276,15 @@ function Products() {
   const handleProductEdit = async (productId) => {
     try {
       const formData = new FormData();
+
+      // Append images
+      if (selectedImages.length > 0) {
+        formData.append("image", selectedImages[0], selectedImages[0].name);
+      }
       // Append form data
       formData.append("_id", productId);
       for (const key in editFormData) {
         formData.append(key, editFormData[key]);
-      }
-
-      // Append images
-      if (selectedImages.length > 0) {
-        selectedImages.forEach((file, index) => {
-          // Append each file with the same key "images"
-          formData.append("images", file, `image${index}`);
-        });
       }
 
       // console FormData
@@ -307,8 +305,6 @@ function Products() {
         window.alert(errorMessage);
         return;
       }
-
-      console.log("Submitted data for the update", formData);
     } catch (error) {
       console.error("An unexpected error occurred:", error);
       window.alert("An unexpected error occurred. Please try again later.");
@@ -555,7 +551,7 @@ function Products() {
                       <input
                         type="file"
                         multiple
-                        onChange={handleEditChange}
+                        onChange={handleImagesSelection}
                       ></input>
                     </td>
                     <td>
@@ -606,13 +602,23 @@ function Products() {
                       </div>
                     </td>
                     <td>
-                      {product.images.map((imgUrl, index) => (
-                        <img
-                          key={`${product._id}-${index}`}
-                          src={imgUrl}
-                          alt={`${product.name} ${index + 1}`}
-                        />
-                      ))}
+                      {product.images.map((imgUrl, index) => {
+                        if (
+                          imgUrl.includes(`${product.name + ".jpg"}`) ||
+                          imgUrl.includes(
+                            `${product.name.toLowerCase() + ".jpg"}`
+                          )
+                        ) {
+                          return (
+                            <img
+                              key={`${product._id}-${index}`}
+                              src={imgUrl}
+                              alt={`${product.name} ${index + 1}`}
+                            />
+                          );
+                        }
+                        return null;
+                      })}
                     </td>
                     <td>{product.name}</td>
                     <td>

@@ -52,11 +52,11 @@ const storageRef = ref(storage); // points to the root of the Cloud Storage buck
 const folderRef = ref(storage, "images"); // points to 'images' folder.
 
 // ---- IMAGES ----
-// --- to MULTER  ---
 const handleImagesUpload = (req, res, next) => {
+  // --- to MULTER  ---
   multerUpload.array("images", 15)(req, res, async (error) => {
     if (error) {
-      console.error("Multer error:", error);
+      console.error("MULTER error:", error);
       return res.status(500).send("Internal Server Error");
     }
 
@@ -75,25 +75,26 @@ const handleImagesUpload = (req, res, next) => {
         contentType: file.mimetype,
       }));
 
-      res.status(200).send("Images in the Multer's buffer.");
+      // --- to FIREBASE ---
+      // data validation ....https://firebase.google.com/docs/storage/security
+
+      const promises = imageObjectsArr.map(async (imageObject) => {
+        const eachImageRef = ref(storage, `images/${imageObject.originalname}`);
+        const snapshot = await uploadBytes(eachImageRef, imageObject.data);
+        return await getDownloadURL(snapshot.ref);
+      });
+
+      // Attach promises to the request object
+      req.imageUploadPromises = promises;
+      res.status(200).send("Images uploaded successfully.");
+      next();
     } catch (error) {
-      console.error("Error while processing Multer files:", error);
+      console.error(
+        "Error while processing Multer files or uploading to Firebase:",
+        error
+      );
       return res.status(500).send("Internal Server Error");
     }
-
-    // --- to FIREBASE ---
-    // data validation ....https://firebase.google.com/docs/storage/security
-
-    const promises = imageObjectsArr.map(async (imageObject) => {
-      const eachImageRef = ref(storage, `images/${imageObject.originalname}`);
-      const snapshot = await uploadBytes(eachImageRef, imageObject.data);
-      return await getDownloadURL(snapshot.ref);
-    });
-
-    // Attach promises to the request object
-    req.imageUploadPromises = promises;
-
-    next();
   });
 };
 
@@ -222,56 +223,65 @@ router.post("/upload/bulk-images", handleImagesUpload, async (req, res) => {
 
 // ----- EDIT ONE -----
 
-router.patch(`/product/:productId`, multerUpload.none(), async (req, res) => {
-  const productId = req.params.productId;
-  console.log("REQ.BODY", req.body);
+router.patch(
+  `/product/:productId`,
+  multerUpload.single("image"),
+  async (req, res) => {
+    const productId = req.params.productId;
+    const productToUpdate = await Berry.findById(productId);
 
-  try {
-    if (req.files && req.files.length !== 0) {
-      await handleImagesUpload(req, res, next);
-
-      const imageURLs = await Promise.all(req.imageUploadPromises);
-
-      // Update with images
-      await Berry.findOneAndUpdate(
-        { _id: productId },
-        {
-          name: req.body.name,
-          availability: req.body.availability,
-          kg: req.body.kg,
-          price: req.body.price,
-          images: imageURLs[0],
-        }
-      );
-    } else {
-      // Update without images
-      console.log("NAME in the req body to db", req.body.name);
-      await Berry.findOneAndUpdate(
-        { _id: productId },
-        {
-          name: req.body.name,
-          availability: req.body.availability,
-          kg: req.body.kg,
-          price: req.body.price,
-        }
-      );
-    }
-
-    // Fetch the updated product for logging
-    const updatedProduct = await Berry.findById(productId);
-
-    if (!updatedProduct) {
+    if (!productToUpdate) {
       console.log("Product not found");
       return res.status(404).send("Product not found");
     }
 
-    console.log(`UPDATED ${req.body.name}`);
-    res.status(204).send();
-  } catch (error) {
-    console.log("Error while updating:", error);
-    res.status(500).send("Internal Server Error");
+    try {
+      // Update with images
+      if (req.file && req.file.length !== 0) {
+        // --- to Multer ---
+        const imageObj = {
+          originalname: req.file.originalname,
+          data: req.file.buffer,
+          contentType: req.file.mimetype,
+        };
+        // --- to Firebase ---
+        // data validation ....https://firebase.google.com/docs/storage/security
+        const imageRef = ref(storage, `images/${imageObj.originalname}`);
+        const snapshot = await uploadBytes(imageRef, imageObj.data);
+        const imageURL = await getDownloadURL(snapshot.ref);
+
+        // --- to DB ---
+        await Berry.findOneAndUpdate(
+          { _id: productId },
+          {
+            name: req.body.name,
+            availability: req.body.availability,
+            kg: req.body.kg,
+            price: req.body.price,
+            images: imageURL,
+          }
+        );
+      } else {
+        // Update without images
+        await Berry.findOneAndUpdate(
+          { _id: productId },
+          {
+            name: req.body.name,
+            availability: req.body.availability,
+            kg: req.body.kg,
+            price: req.body.price,
+          }
+        );
+      }
+
+      console.log(`UPDATED ${req.body.name}`);
+      res.status(204).send();
+    } catch (error) {
+      console.log("Error while updating:", error);
+      res.status(500).send("Internal Server Error");
+    }
   }
-});
+);
 
 // ----- DELETE ALL ------
 
