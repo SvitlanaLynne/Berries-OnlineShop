@@ -16,6 +16,10 @@ function Products() {
   const [selectedImages, setSelectedImages] = useState([]);
   const [selectedCSV, setSelectedCSV] = useState([]);
   const [isEditing, setIsEditing] = useState(null);
+  const [bulkEditForm, setBulkEditForm] = useState({
+    kg: "",
+    price: "",
+  });
   const [editFormData, setEditFormData] = useState({
     name: "",
     availability: true,
@@ -46,7 +50,6 @@ function Products() {
       setTotalProducts(total);
       setProductsLoaded((prev) => prev + data.length);
       setData((prevData) => [...prevData, ...data]);
-      // setData(data);
     } catch (error) {
       window.alert("Unexpected error. Unable to reach the server.");
     } finally {
@@ -273,7 +276,7 @@ function Products() {
     }));
   };
 
-  const handleProductEdit = async (productId) => {
+  const productEdit = async (productId) => {
     try {
       const formData = new FormData();
 
@@ -315,10 +318,54 @@ function Products() {
       setIsEditing(null);
     }
   };
+const enableBulkEdit = () => {
+  // opens a window with the form;
+  //form should have a button Submit, which triggers bulkEdit, inputs fill bulkEditForm
+}
+
+  const bulkEdit = async (checkedItems) => {
+    try {
+      const formDataBulk = new FormData();
+
+      // Append form data
+      formDataBulk.append("_id", checkedItems);
+      for (const key in bulkEditForm) {
+        formDataBulk.append(key, bulkEditForm[key]);
+      }
+
+      // console FormData
+      for (const [key, value] of formDataBulk.entries()) {
+        console.log(`${key}: ${value}`);
+      }
+
+      const serverResponse = await fetch(`${Url}/product/bulk`, {
+        method: "PATCH",
+        body: formDataBulk,
+      });
+
+      if (!serverResponse.ok) {
+        const errorMessage = await serverResponse.text();
+        console.error(
+          `Error during Bulk editing. Status: ${serverResponse.status}, Message: ${errorMessage}`
+        );
+        window.alert(errorMessage);
+        return;
+      }
+    } catch (error) {
+      console.error("An unexpected error occurred:", error);
+      window.alert("An unexpected error occurred. Please try again later.");
+    } finally {
+      setData([]);
+      await fetchData();
+      setBulkEditForm([]);
+      setCheckedItems([]);
+      // setIsEditing(null);
+    }
+  };
 
   // ----- DELETE ONE -----
 
-  function handleDelete() {
+  function Delete() {
     const itemsId = "______";
 
     fetch(`___________/${itemsId}`, {
@@ -338,7 +385,7 @@ function Products() {
   }
 
   // ----- DELETE ALL -----
-  async function handleDeleteAll() {
+  async function DeleteAll() {
     try {
       const response = await fetch(Url + "/All", {
         method: "DELETE",
@@ -380,19 +427,29 @@ function Products() {
     setActionDropDownShown((prev) => !prev);
   };
 
-  const handleOptionChange = (e) => {
-    const selectedOption = e.target.value;
+  const handleActionChange = (e) => {
+    const selectedAction = e.target.value;
 
-    if (selectedOption === "Delete") {
-      handleDelete();
-    } else if (selectedOption === "Delete All") {
-      handleDeleteAll();
+    switch (selectedAction) {
+      case "Delete":
+        Delete();
+        break;
+      case "Delete All":
+        DeleteAll();
+        break;
+      case "Bulk Edit":
+        enableBulkEdit();
+        break;
     }
-  };
 
-  const handleCheckedChange = () => {
-    // remove from/add to the checked array
-    setCheckedItems((prev) => !prev);
+  const handleCheckedChange = (productId) => {
+    setCheckedItems((prevItems) => {
+      if (!prevItems.includes(productId)) {
+        return [...prevItems, productId];
+      } else {
+        return prevItems.filter((x) => x !== productId);
+      }
+    });
   };
 
   // function checkedAll() {}
@@ -469,9 +526,10 @@ function Products() {
                       Action
                     </label>
                     {actionDropDownShown ? (
-                      <select onChange={handleOptionChange}>
+                      <select onChange={handleActionChange}>
                         <option></option>
-                        <option>Change Category</option>
+                        <option>Bulk Edit</option>
+                        <option>Delete</option>
                         <option>Delete All</option>
                       </select>
                     ) : (
@@ -583,7 +641,7 @@ function Products() {
                       />
                     </td>
                     <td>
-                      <button onClick={() => handleProductEdit(product._id)}>
+                      <button onClick={() => productEdit(product._id)}>
                         Submit
                       </button>
                       <button onClick={() => setIsEditing(null)}>Cancel</button>
