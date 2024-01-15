@@ -17,6 +17,7 @@ function Products() {
   const [selectedCSV, setSelectedCSV] = useState([]);
   const [isEditing, setIsEditing] = useState(null);
   const [bulkEditForm, setBulkEditForm] = useState({
+    availability: true,
     kg: "",
     price: "",
   });
@@ -318,17 +319,38 @@ function Products() {
       setIsEditing(null);
     }
   };
-const enableBulkEdit = () => {
-  // opens a window with the form;
-  //form should have a button Submit, which triggers bulkEdit, inputs fill bulkEditForm
-}
+
+  // ----- BULK EDIT   -----
+
+  const openBulkEditWindow = () => {
+    if (checkedItems.length <= 1) {
+      window.alert("Please select several products to modify");
+      return;
+    }
+    document.getElementById("bulkEditWindow").style.display = "flex";
+  };
+  const closeBulkEditWindow = () => {
+    document.getElementById("bulkEditWindow").style.display = "none";
+  };
+
+  const handleBulkChange = (e) => {
+    const { name, value } = e.target;
+
+    setBulkEditForm((prevForm) => ({
+      ...prevForm,
+      [name]: value,
+      availability: formData.kg !== "0",
+    }));
+  };
 
   const bulkEdit = async (checkedItems) => {
     try {
       const formDataBulk = new FormData();
 
       // Append form data
-      formDataBulk.append("_id", checkedItems);
+      for (const id of checkedItems) {
+        formDataBulk.append("_id", id);
+      }
       for (const key in bulkEditForm) {
         formDataBulk.append(key, bulkEditForm[key]);
       }
@@ -357,9 +379,7 @@ const enableBulkEdit = () => {
     } finally {
       setData([]);
       await fetchData();
-      setBulkEditForm([]);
       setCheckedItems([]);
-      // setIsEditing(null);
     }
   };
 
@@ -405,6 +425,34 @@ const enableBulkEdit = () => {
     }
   }
   // ----- HANDLERS -----
+  const handleActionChange = (e) => {
+    const selectedAction = e.target.value;
+
+    switch (selectedAction) {
+      case "Delete":
+        Delete();
+        break;
+      case "Delete All":
+        DeleteAll();
+        break;
+      case "Bulk Edit":
+        openBulkEditWindow();
+        break;
+      default:
+        console.log("No action selected");
+        break;
+    }
+  };
+
+  const handleCheckedChange = (productId) => {
+    setCheckedItems((prevItems) => {
+      if (!prevItems.includes(productId)) {
+        return [...prevItems, productId];
+      } else {
+        return prevItems.filter((x) => x !== productId);
+      }
+    });
+  };
 
   const handleImagesSelection = (e) => {
     setSelectedImages(Array.from(e.target.files));
@@ -425,31 +473,6 @@ const enableBulkEdit = () => {
 
   const showDropDown = () => {
     setActionDropDownShown((prev) => !prev);
-  };
-
-  const handleActionChange = (e) => {
-    const selectedAction = e.target.value;
-
-    switch (selectedAction) {
-      case "Delete":
-        Delete();
-        break;
-      case "Delete All":
-        DeleteAll();
-        break;
-      case "Bulk Edit":
-        enableBulkEdit();
-        break;
-    }
-
-  const handleCheckedChange = (productId) => {
-    setCheckedItems((prevItems) => {
-      if (!prevItems.includes(productId)) {
-        return [...prevItems, productId];
-      } else {
-        return prevItems.filter((x) => x !== productId);
-      }
-    });
   };
 
   // function checkedAll() {}
@@ -505,6 +528,32 @@ const enableBulkEdit = () => {
               onChange={handleImagesSelection}
             ></input>
             <button onClick={() => importBulkImages()}>Submit</button>
+          </div>
+        </div>
+        {/* ------------- a window appears ------------- */}
+        <div id="bulkEditWindow" className="modalWindow">
+          <span className="closeX" onClick={() => closeBulkEditWindow()}>
+            &times;
+          </span>
+          <div>
+            <label>Kg</label>
+            <input
+              type="number"
+              name="kg"
+              value={bulkEditForm.kg}
+              onChange={handleBulkChange}
+              placeholder="1"
+            />
+            <label>Price</label>
+            <input
+              type="number"
+              name="price"
+              value={bulkEditForm.price}
+              onChange={handleBulkChange}
+              placeholder="8"
+            />
+            <button onClick={() => bulkEdit(checkedItems)}>Submit</button>
+            <button onClick={() => closeBulkEditWindow()}>Cancel</button>
           </div>
         </div>
         {/* ---------- filters ---------- */}

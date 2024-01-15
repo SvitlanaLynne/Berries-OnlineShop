@@ -129,6 +129,7 @@ router.post("/upload/form", handleImagesUpload, async (req, res) => {
 });
 
 // ----- INSERT MANY FROM FILE -----
+
 // ---- Upload Bulk Data from CSV  ----
 router.post(
   "/import/products",
@@ -282,6 +283,44 @@ router.patch(
     }
   }
 );
+
+// ----- BULK EDIT   -----
+
+router.patch("/product/bulk", async (req, res) => {
+  const idArr = req.body.productIds;
+
+  try {
+    // Check if found
+    const productsToUpdate = await Berry.find({ _id: { $in: idArr } });
+    if (productsToUpdate.length !== idArr.length) {
+      const notFoundProducts = idArr.filter(
+        (productId) =>
+          !productsToUpdate.some((product) => product._id == productId)
+      );
+      console.log(`Products ${notFoundProducts.join(", ")} not found`);
+      return res.status(404).send("One or more products not found");
+    }
+
+    // Update each
+    for (const productId of idArr) {
+      await Berry.findByIdAndUpdate(
+        productId,
+        {
+          availability: req.body.availability,
+          kg: req.body.kg,
+          price: req.body.price,
+        },
+        { new: true }
+      );
+      console.log(`UPDATED product with ID ${productId}`);
+    }
+
+    res.status(204).send();
+  } catch (error) {
+    console.log("Error while Bulk update:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 // ----- DELETE ALL ------
 
