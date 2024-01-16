@@ -343,14 +343,16 @@ function Products() {
     }));
   };
 
-  const bulkEdit = async (checkedItems) => {
+  const bulkEdit = async () => {
     try {
       const formDataBulk = new FormData();
 
-      // Append form data
+      // formDataBulk.append("_id", checkedItems);
+
       for (const id of checkedItems) {
         formDataBulk.append("_id", id);
       }
+
       for (const key in bulkEditForm) {
         formDataBulk.append(key, bulkEditForm[key]);
       }
@@ -360,7 +362,7 @@ function Products() {
         console.log(`${key}: ${value}`);
       }
 
-      const serverResponse = await fetch(`${Url}/product/bulk`, {
+      const serverResponse = await fetch(`${Url}/bulk`, {
         method: "PATCH",
         body: formDataBulk,
       });
@@ -380,6 +382,7 @@ function Products() {
       setData([]);
       await fetchData();
       setCheckedItems([]);
+      closeBulkEditWindow();
     }
   };
 
@@ -552,7 +555,7 @@ function Products() {
               onChange={handleBulkChange}
               placeholder="8"
             />
-            <button onClick={() => bulkEdit(checkedItems)}>Submit</button>
+            <button onClick={() => bulkEdit()}>Submit</button>
             <button onClick={() => closeBulkEditWindow()}>Cancel</button>
           </div>
         </div>
