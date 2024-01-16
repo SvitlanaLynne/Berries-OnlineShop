@@ -2,6 +2,11 @@ import { useState, useEffect, useCallback } from "react";
 import ImportBar from "../import-Bar";
 
 function Products() {
+  const initialBulkEditFormState = {
+    availability: true,
+    kg: "",
+    price: "",
+  };
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [pageLoading, setPageLoading] = useState(true);
@@ -16,11 +21,7 @@ function Products() {
   const [selectedImages, setSelectedImages] = useState([]);
   const [selectedCSV, setSelectedCSV] = useState([]);
   const [isEditing, setIsEditing] = useState(null);
-  const [bulkEditForm, setBulkEditForm] = useState({
-    availability: true,
-    kg: "",
-    price: "",
-  });
+  const [bulkEditForm, setBulkEditForm] = useState(initialBulkEditFormState);
   const [editFormData, setEditFormData] = useState({
     name: "",
     availability: true,
@@ -383,6 +384,7 @@ function Products() {
       await fetchData();
       setCheckedItems([]);
       closeBulkEditWindow();
+      setBulkEditForm(initialBulkEditFormState);
     }
   };
 

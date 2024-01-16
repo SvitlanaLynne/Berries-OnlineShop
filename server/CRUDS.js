@@ -286,38 +286,56 @@ router.patch(
 
 // ----- BULK EDIT   -----
 
-router.patch("/bulk", async (req, res) => {
-  const idArr = req.body.getAll("_id");
-  // const idArr = JSON.parse(req.body._id);
+router.patch("/bulk", multerUpload.array("_id"), async (req, res) => {
+  const idArr = req.body._id;
 
   try {
-    console.log("GETALL", idArr);
-    //   // Check if found
-    //   const productsToUpdate = await Berry.find({ _id: { $in: idArr } });
-    //   if (productsToUpdate.length !== idArr.length) {
-    //     const notFoundProducts = idArr.filter(
-    //       (productId) =>
-    //         !productsToUpdate.some((product) => product._id == productId)
-    //     );
-    //     console.log(`Products ${notFoundProducts.join(", ")} not found`);
-    //     return res.status(404).send("One or more products not found");
-    //   }
+    // Check if found
+    const productsToUpdate = await Berry.find({ _id: { $in: idArr } });
 
-    //   // Update each
-    //   for (const productId of idArr) {
-    //     await Berry.findByIdAndUpdate(
-    //       productId,
-    //       {
-    //         availability: req.body.availability,
-    //         kg: req.body.kg,
-    //         price: req.body.price,
-    //       },
-    //       { new: true }
-    //     );
-    //     console.log(`UPDATED product with ID ${productId}`);
-    //   }
+    if (productsToUpdate.length !== idArr.length) {
+      const notFoundProducts = idArr.filter(
+        (productId) =>
+          !productsToUpdate.some((product) => product._id == productId)
+      );
+      console.log(`Products ${notFoundProducts.join(", ")} not found`);
+      return res.status(404).send("One or more products not found");
+    }
+    // which fields to update
+    const fieldsToUpdate = () => {
+      const { kg, price, availability } = req.body;
 
-    res.status(204).send();
+      if ((kg === "" && price !== "") || (kg !== "" && price === "")) {
+        return kg === "" ? { price } : { kg, availability };
+      } else if (kg === "" && price === "") {
+        return null;
+      } else {
+        return { kg, price, availability };
+      }
+    };
+
+    const updateFields = fieldsToUpdate();
+
+    if (updateFields) {
+      for (const productId of idArr) {
+        const updatedProduct = await Berry.findByIdAndUpdate(
+          productId,
+          updateFields,
+          { new: true }
+        );
+
+        if (updatedProduct) {
+          console.log(`UPDATED product with ID ${productId}`);
+        }
+      }
+      res.status(204).send();
+    } else {
+      // if empty submission
+      const errorMessage =
+        "Nothing submitted. Please enter weight or price of the products to update.";
+      console.log(errorMessage);
+      res.status(400).send(errorMessage);
+    }
   } catch (error) {
     console.log("Error while Bulk update:", error);
     res.status(500).send("Internal Server Error");
