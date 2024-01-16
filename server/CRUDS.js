@@ -284,7 +284,7 @@ router.patch(
   }
 );
 
-// ----- BULK EDIT   -----
+// ----- BULK EDIT -----
 
 router.patch("/bulk", multerUpload.array("_id"), async (req, res) => {
   const idArr = req.body._id;
@@ -342,6 +342,47 @@ router.patch("/bulk", multerUpload.array("_id"), async (req, res) => {
   }
 });
 
+// ----- DELETE ONE -----
+
+router.all("*", (req, res) => {
+  console.log("Request received:", req.method, req.url);
+  res.status(404).json({ message: "Not Found" });
+});
+
+router.delete(`/product/:productId`, async (req, res) => {
+  const productId = req.params.productId;
+  console.log("ID from params", productId);
+  //   const productToDelete = await Berry.findById(productId);
+  //   console.log("PRODUCT TO DEL", productToDelete);
+
+  // if (!productToDelete) {
+  //   console.log("Product not found");
+  //   return res.status(404).send("Product not found");
+  // }
+
+  // try {
+  //   //delete corresponding images
+  //   const imagesUrlArr = productToDelete.images;
+  //   const imageNameArr = () => {
+  //     let result = [];
+  //     for (const url in imagesUrlArr) {
+  //       let pathArr = url.split("/");
+  //       let imgName = pathArr[pathArr.length - 1];
+  //       result.push(imgName);
+  //     }
+  //     return result;
+  //   };
+
+  //   const imgNames = imageNameArr();
+  //   console.log("IMG NAMES to delete", imgNames);
+
+  //   //delete product
+  // } catch (error) {
+  //   console.log("Error while updating:", error);
+  //   res.status(500).send("Internal Server Error");
+  // }
+});
+
 // ----- DELETE ALL ------
 
 router.delete("/All", async (req, res) => {
@@ -356,16 +397,19 @@ router.delete("/All", async (req, res) => {
   }
   // ---- In Firebase (IMAGES) using List ----
   listAll(folderRef)
+    // console root folder
     .then((res) => {
       res.prefixes.forEach((folderRef) => {
         console.log("Subdirectory found:", folderRef.name);
       });
+      // console names
       res.items.forEach((itemRef) => {
         console.log(
           "\nList of all images in the Firebase before action:",
           itemRef.name
         );
       });
+      //delete each
       const promisesToDelArr = res.items.map((item) => {
         return deleteObject(item); // delete() method returns promises
       });

@@ -390,12 +390,11 @@ function Products() {
 
   // ----- DELETE ONE -----
 
-  function Delete() {
-    const itemsId = "______";
-
-    fetch(`___________/${itemsId}`, {
+  function Delete(productId) {
+    console.log("Product ID", productId);
+    fetch(`/product/${productId}`, {
       method: "DELETE",
-      Headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" },
     })
       .then((res) => {
         if (!res.ok) {
@@ -404,8 +403,8 @@ function Products() {
           console.log("Deleted successfully.");
         }
       })
-      .catch((err) => {
-        console.log("Error while deleting: ", err);
+      .catch((error) => {
+        console.log("Error while deleting: ", error);
       });
   }
 
@@ -746,7 +745,9 @@ function Products() {
                       <button onClick={() => enableEdit(product._id)}>
                         Edit
                       </button>
-                      <button>Delete</button>
+                      <button onClick={() => Delete(product._id)}>
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 );
