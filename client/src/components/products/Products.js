@@ -390,23 +390,31 @@ function Products() {
 
   // ----- DELETE ONE -----
 
-  function Delete(productId) {
-    console.log("Product ID", productId);
-    fetch(`/product/${productId}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`Delete operation failed. ${res.status}`);
-        } else {
-          console.log("Deleted successfully.");
-        }
-      })
-      .catch((error) => {
-        console.log("Error while deleting: ", error);
+  async function Delete(ProductId) {
+    try {
+      const response = await fetch(Url + `/product/${ProductId}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
       });
+
+      if (!response.ok) {
+        throw new Error(`Delete operation failed. ${response.status}`);
+      }
+
+      console.log("The item has been deleted successfully.");
+    } catch (error) {
+      console.error("Unsuccessful Delete:", error);
+      window.alert("An unexpected error occurred while deleting the item.");
+    } finally {
+      setPage(1);
+      setData([]);
+      await fetchData();
+    }
   }
+
+  // ---- DELETE BULK -----
+
+  const DeleteBulk = () => {};
 
   // ----- DELETE ALL -----
   async function DeleteAll() {
@@ -434,7 +442,7 @@ function Products() {
 
     switch (selectedAction) {
       case "Delete":
-        Delete();
+        DeleteBulk();
         break;
       case "Delete All":
         DeleteAll();

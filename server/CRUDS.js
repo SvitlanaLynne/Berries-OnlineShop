@@ -23,6 +23,9 @@ const multerUpload = multer({ storage: multerStorage });
 
 const fireConfig = initializeApp(firebaseConfig);
 console.log("Collection Name:", Berry.collection.name);
+const storage = getStorage(fireConfig);
+const storageRef = ref(storage); // points to the root of the Cloud Storage bucket.
+const folderRef = ref(storage, "images"); // points to 'images' folder.
 
 // ----- GET -----
 
@@ -45,11 +48,7 @@ router.get("/products", async (req, res) => {
   }
 });
 
-// // ----- INSERT ONE WITH IMAGES -----
-
-const storage = getStorage(fireConfig);
-const storageRef = ref(storage); // points to the root of the Cloud Storage bucket.
-const folderRef = ref(storage, "images"); // points to 'images' folder.
+// ----- INSERT ONE WITH IMAGES -----
 
 // ---- IMAGES ----
 const handleImagesUpload = (req, res, next) => {
@@ -344,43 +343,48 @@ router.patch("/bulk", multerUpload.array("_id"), async (req, res) => {
 
 // ----- DELETE ONE -----
 
-router.all("*", (req, res) => {
-  console.log("Request received:", req.method, req.url);
-  res.status(404).json({ message: "Not Found" });
-});
+const deleteImage = async (imageName) => {
+  const imageRef = ref(storage, `images/${imageName}.jpg`);
+  // const imageRef = storageRef.child(`images/${imageName}.jpg`);
+  await deleteObject(imageRef);
+  console.log(`Image ${imageName} deleted successfully.`);
+};
+
+const deleteImages = async (imageNames) => {
+  try {
+    await Promise.all(imageNames.map(deleteImage));
+  } catch (error) {
+    console.error("Error deleting images:", error);
+    throw error;
+  }
+};
 
 router.delete(`/product/:productId`, async (req, res) => {
   const productId = req.params.productId;
-  console.log("ID from params", productId);
-  //   const productToDelete = await Berry.findById(productId);
-  //   console.log("PRODUCT TO DEL", productToDelete);
 
-  // if (!productToDelete) {
-  //   console.log("Product not found");
-  //   return res.status(404).send("Product not found");
-  // }
+  try {
+    const productToDelete = await Berry.findById(productId);
 
-  // try {
-  //   //delete corresponding images
-  //   const imagesUrlArr = productToDelete.images;
-  //   const imageNameArr = () => {
-  //     let result = [];
-  //     for (const url in imagesUrlArr) {
-  //       let pathArr = url.split("/");
-  //       let imgName = pathArr[pathArr.length - 1];
-  //       result.push(imgName);
-  //     }
-  //     return result;
-  //   };
+    if (!productToDelete) {
+      console.log("Product not found");
+      return res.status(404).send("Product not found");
+    }
 
-  //   const imgNames = imageNameArr();
-  //   console.log("IMG NAMES to delete", imgNames);
+    const urls = productToDelete.images;
+    const imageNames = urls.map((url) => {
+      const match = url.match(/\/images%2F(.+?)\.(jpg|jpeg|png|gif)\?/i);
+      return match ? match[1] : null;
+    });
 
-  //   //delete product
-  // } catch (error) {
-  //   console.log("Error while updating:", error);
-  //   res.status(500).send("Internal Server Error");
-  // }
+    console.log("IMG NAMES to delete", imageNames);
+
+    await deleteImages(imageNames);
+
+    res.status(204).send("\nImages Deleted from the Firebase\n");
+  } catch (error) {
+    console.log("Error while deleting one or more images", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 // ----- DELETE ALL ------
