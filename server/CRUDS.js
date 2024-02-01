@@ -345,7 +345,6 @@ router.patch("/bulk", multerUpload.array("_id"), async (req, res) => {
 
 const deleteImage = async (imageName) => {
   const imageRef = ref(storage, `images/${imageName}.jpg`);
-  // const imageRef = storageRef.child(`images/${imageName}.jpg`);
   await deleteObject(imageRef);
   console.log(`Image ${imageName} deleted successfully.`);
 };
@@ -354,8 +353,7 @@ const deleteImages = async (imageNames) => {
   try {
     await Promise.all(imageNames.map(deleteImage));
   } catch (error) {
-    console.error("Error deleting images:", error);
-    throw error;
+    console.error("NOTICE during deleting images:", error);
   }
 };
 
@@ -363,6 +361,7 @@ router.delete(`/product/:productId`, async (req, res) => {
   const productId = req.params.productId;
 
   try {
+    // earse images from firebase
     const productToDelete = await Berry.findById(productId);
 
     if (!productToDelete) {
@@ -371,18 +370,96 @@ router.delete(`/product/:productId`, async (req, res) => {
     }
 
     const urls = productToDelete.images;
-    const imageNames = urls.map((url) => {
-      const match = url.match(/\/images%2F(.+?)\.(jpg|jpeg|png|gif)\?/i);
-      return match ? match[1] : null;
-    });
+    if (urls && urls.length > 0) {
+      const imageNames = urls.map((url) => {
+        const match = url.match(/\/images%2F(.+?)\.(jpg|jpeg|png|gif)\?/i);
+        return match ? match[1] : null;
+      });
 
-    console.log("IMG NAMES to delete", imageNames);
+      const checkImageExistance = async (imageName) => {
+        const imageRef = ref(storage, `images/${imageName}.jpg`);
 
-    await deleteImages(imageNames);
+        try {
+          const url = await getDownloadURL(imageRef);
+          return true;
+        } catch (error) {
+          return false;
+        }
+      };
 
-    res.status(204).send("\nImages Deleted from the Firebase\n");
+      const checkImagesExistance = (imageNames) => {
+        try {
+          let result = [];
+          imageNames.map((imageName) =>
+            result.push(checkImageExistance(imageName))
+          );
+          return !result.includes(false);
+        } catch (error) {
+          console.error("Error while searching images:", error);
+          throw error;
+        }
+      };
+      const imagesExist = checkImagesExistance(imageNames);
+      if (imagesExist) {
+        await deleteImages(imageNames);
+      }
+    } else {
+      console.log(
+        "At least one image not found. Deleteing the product anyway..."
+      );
+    }
+
+    // erase product from db
+    await Berry.deleteOne({ _id: productId });
+    console.log(`PRODUCT with the ID ${productId} was successfully DELETED`);
+
+    res
+      .status(204)
+      .send("\nProduct  and its Images are successfully Deleted \n");
   } catch (error) {
-    console.log("Error while deleting one or more images", error);
+    console.log("Error while deleting product or its images", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// ----- BULK DELETE -----
+
+router.delete("/bulkDel", async (req, res) => {
+  const idArr = req.query._id;
+
+  try {
+    // Check if found
+    const productsToBulkDelete = await Berry.find({ _id: { $in: idArr } });
+
+    if (productsToBulkDelete.length !== idArr.length) {
+      const notFoundProducts = idArr.filter(
+        (productId) =>
+          !productsToBulkDelete.some((product) => product._id == productId)
+      );
+      console.log(`Products ${notFoundProducts.join(", ")} not found`);
+      return res.status(404).send("One or more products not found");
+    }
+
+    if (productsToBulkDelete.length > 0) {
+      const deletedProductNames = [];
+
+      for (const productId of idArr) {
+        const deletedProduct = await Berry.findByIdAndDelete(productId);
+
+        if (deletedProduct) {
+          deletedProductNames.push(deletedProduct.name);
+        }
+      }
+
+      if (deletedProductNames.length > 0) {
+        console.log(
+          `Deleted the following products: ${deletedProductNames.join(", ")}`
+        );
+      }
+      res.status(204).send();
+    }
+  } catch (error) {
+    console.error("Error while Bulk Delete:", error.message);
     res.status(500).send("Internal Server Error");
   }
 });

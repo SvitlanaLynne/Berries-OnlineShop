@@ -348,8 +348,6 @@ function Products() {
     try {
       const formDataBulk = new FormData();
 
-      // formDataBulk.append("_id", checkedItems);
-
       for (const id of checkedItems) {
         formDataBulk.append("_id", id);
       }
@@ -391,30 +389,134 @@ function Products() {
   // ----- DELETE ONE -----
 
   async function Delete(ProductId) {
-    try {
-      const response = await fetch(Url + `/product/${ProductId}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+    //reassuring
+    const confirmDel = async () => {
+      return new Promise((resolve) => {
+        document.getElementById("deleteProductWindow").style.display = "flex";
+
+        const deleteButton = document.getElementById("deleteButton");
+        const cancelButton = document.getElementById("cancelButton");
+        const closeModalButton = document.getElementById("closeModal");
+
+        const onDeleteClick = () => {
+          resolve(true);
+          document.getElementById("deleteProductWindow").style.display = "none";
+          cleanUpListeners();
+        };
+
+        const onCancelClick = () => {
+          resolve(false);
+          document.getElementById("deleteProductWindow").style.display = "none";
+          cleanUpListeners();
+        };
+
+        const onCloseModalClick = () => {
+          resolve(false);
+          document.getElementById("deleteProductWindow").style.display = "none";
+          cleanUpListeners();
+        };
+
+        const cleanUpListeners = () => {
+          deleteButton.removeEventListener("click", onDeleteClick);
+          cancelButton.removeEventListener("click", onCancelClick);
+          closeModalButton.removeEventListener("click", onCloseModalClick);
+        };
+
+        deleteButton.addEventListener("click", onDeleteClick);
+        cancelButton.addEventListener("click", onCancelClick);
+        closeModalButton.addEventListener("click", onCloseModalClick);
       });
+    };
 
-      if (!response.ok) {
-        throw new Error(`Delete operation failed. ${response.status}`);
+    if (await confirmDel()) {
+      try {
+        const response = await fetch(Url + `/product/${ProductId}`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Delete operation failed. ${response.status}`);
+        }
+
+        console.log("The item has been deleted successfully.");
+      } catch (error) {
+        console.error("Unsuccessful Delete:", error);
+        window.alert("An unexpected error occurred while deleting the item.");
+      } finally {
+        setPage(1);
+        setData([]);
+        await fetchData();
       }
-
-      console.log("The item has been deleted successfully.");
-    } catch (error) {
-      console.error("Unsuccessful Delete:", error);
-      window.alert("An unexpected error occurred while deleting the item.");
-    } finally {
-      setPage(1);
-      setData([]);
-      await fetchData();
     }
   }
 
   // ---- DELETE BULK -----
 
-  const DeleteBulk = () => {};
+  const DeleteBulk = async () => {
+    if (checkedItems.length <= 1) {
+      window.alert("Please select several products to modify");
+      return;
+    }
+    const confirmBulkDel = async () => {
+      return new Promise((resolve) => {
+        document.getElementById("bulkDeleteWindow").style.display = "flex";
+
+        const deleteButton = document.getElementById("bulkDeleteButton");
+        const cancelButton = document.getElementById("bulkCancelButton");
+        const closeModalButton = document.getElementById("bulkDelCloseModal");
+
+        const onDeleteClick = () => {
+          resolve(true);
+          document.getElementById("bulkDeleteWindow").style.display = "none";
+          cleanUpListeners();
+        };
+
+        const onCancelClick = () => {
+          resolve(false);
+          document.getElementById("bulkDeleteWindow").style.display = "none";
+          cleanUpListeners();
+        };
+
+        const onCloseModalClick = () => {
+          resolve(false);
+          document.getElementById("bulkDeleteWindow").style.display = "none";
+          cleanUpListeners();
+        };
+
+        const cleanUpListeners = () => {
+          deleteButton.removeEventListener("click", onDeleteClick);
+          cancelButton.removeEventListener("click", onCancelClick);
+          closeModalButton.removeEventListener("click", onCloseModalClick);
+        };
+
+        deleteButton.addEventListener("click", onDeleteClick);
+        cancelButton.addEventListener("click", onCancelClick);
+        closeModalButton.addEventListener("click", onCloseModalClick);
+      });
+    };
+
+    if (await confirmBulkDel()) {
+      try {
+        const queryParams = checkedItems.map((id) => `_id=${id}`).join("&");
+        const response = await fetch(`${Url}/bulkDel?${queryParams}`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        });
+        if (!response.ok) {
+          throw new Error(`Bulk Deletion failed. ${response.status}`);
+        }
+        console.log("All selected items have been Deleted successfully.");
+      } catch (error) {
+        console.error("An unexpected error occurred:", error);
+        window.alert("An unexpected error occurred. Please try again later.");
+      } finally {
+        setData([]);
+        await fetchData();
+        setCheckedItems([]);
+      }
+    }
+  };
 
   // ----- DELETE ALL -----
   async function DeleteAll() {
@@ -540,6 +642,30 @@ function Products() {
               onChange={handleImagesSelection}
             ></input>
             <button onClick={() => importBulkImages()}>Submit</button>
+          </div>
+        </div>
+        {/* ------------- a window appears ------------- */}
+        <div id="deleteProductWindow" className="modalWindow">
+          <span className="closeX" id="closeModal">
+            &times;
+          </span>
+          <div>
+            <span>Are you sure you'd like to delete this item?</span>
+            <button id="deleteButton">Delete</button>
+            <button id="cancelButton">Cancel</button>
+          </div>
+        </div>
+        {/* ------------- a window appears ------------- */}
+        <div id="bulkDeleteWindow" className="modalWindow">
+          <span className="closeX" id="bulkDelCloseModal">
+            &times;
+          </span>
+          <div>
+            <span>
+              You are about to delete selected items. Please confirm to proceed.
+            </span>
+            <button id="bulkDeleteButton">Delete</button>
+            <button id="bulkCancelButton">Cancel</button>
           </div>
         </div>
         {/* ------------- a window appears ------------- */}
