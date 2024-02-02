@@ -27,6 +27,5 @@ yarn-error.log*
 Source
 
 # custom
-separate_B.js
-separate_F.js
+firebaseConfig.js
 backup_CRUDS.js

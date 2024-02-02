@@ -2,6 +2,7 @@ import express from "express";
 import { connectDB } from "./dbConnection.js";
 import Berry from "./model.js";
 import { initializeApp } from "firebase/app";
+import firebaseConfig from "./firebase/firebaseConfig.js";
 import {
   getStorage,
   ref,
