@@ -1,6 +1,8 @@
 import { initializeApp } from "firebase/app";
 import firebaseConfig from "./firebaseConfig";
-import firebaseui from "firebaseui";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
-const firebase = initializeApp(firebaseConfig);
-const ui = new firebaseui.auth.AuthUI(firebase.auth());
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+
