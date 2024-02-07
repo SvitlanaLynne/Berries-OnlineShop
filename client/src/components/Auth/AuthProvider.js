@@ -8,7 +8,7 @@ import {
 } from "firebase/auth";
 
 // set up initial context
-const AuthContext = createContext({ userId: "", email: "" });
+const AuthContext = createContext(null);
 
 // use the provider
 export function useAuth() {
@@ -22,14 +22,15 @@ function AuthContextProvider({ children }) {
   const value = { currentUser, logout, login, signup };
 
   function login(usr, pwd) {
-    signInWithEmailAndPassword(auth, usr, pwd);
+    return signInWithEmailAndPassword(auth, usr, pwd);
   }
+
   function logout() {
-    signOut(auth);
+    return signOut(auth);
   }
 
   function signup(usr, pwd) {
-    createUserWithEmailAndPassword(auth, usr, pwd);
+    return createUserWithEmailAndPassword(auth, usr, pwd);
   }
 
   useEffect(() => {
@@ -37,8 +38,9 @@ function AuthContextProvider({ children }) {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       try {
         if (user && user.id) {
-          setCurrentUser({ userId: user.id, email: user.email });
+          setCurrentUser((user) => setCurrentUser(user));
         } else {
+          console.log("No logged in users.");
           setCurrentUser(null);
         }
       } catch (error) {
