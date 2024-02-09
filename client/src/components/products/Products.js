@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import ImportBar from "../import-Bar";
+import Url from "../../config";
 
 function Products() {
   const initialBulkEditFormState = {
@@ -34,8 +35,6 @@ function Products() {
     kg: "",
     price: "",
   });
-
-  const Url = "http://localhost:5050";
 
   // ----- GET PRODUCTS -----
 

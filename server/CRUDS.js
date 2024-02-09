@@ -1,7 +1,11 @@
 import express from "express";
 import { connectDB } from "./dbConnection.js";
 import Berry from "./model.js";
-import { initializeApp } from "firebase/app";
+import { initializeApp as initializeAdminApp } from "firebase-admin/app";
+import { admin } from "firebase-admin";
+import { initializeApp as initializeStorageApp } from "firebase/app";
+import { readFileSync } from "fs";
+
 import firebaseConfig from "./firebase/firebaseConfig.js";
 import {
   getStorage,
@@ -15,16 +19,47 @@ import multer from "multer";
 import csvParser from "csv-parser";
 import { Readable } from "stream";
 
-// ----- FOR CRUDS: EXPRESS ROUTER(ENDPOINTS), MULTER, DB CONNECTION, FIREBASE -----
+// ----- FOR CRUDS: EXPRESS ROUTER(ENDPOINTS), MULTER, DB CONNECTION, FIREBASE(STORAGE & AUTH) -----
 
 const router = express.Router();
 const connect = await connectDB();
 const multerStorage = multer.memoryStorage();
 const multerUpload = multer({ storage: multerStorage });
 
-const fireConfig = initializeApp(firebaseConfig);
+// ---- Admin Access Set Up ----
+const path = "./firebase/berries-c3141-firebase-adminsdk-6hs4u-4789e65509.json";
+const fileContent = readFileSync(path, "utf8");
+const serviceAccount = JSON.parse(fileContent);
+
+admin.initializeAdminApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+
+// Receive token from the Authorization header
+app.post("/auth", async (req, res) => {
+  try {
+    const idToken = req.headers.authorization.split("Bearer ")[1];
+
+    // Verify token
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+
+    console.log("Decoded Token:", decodedToken);
+    res.status(200).send("ID token verification successful");
+  } catch (error) {
+    console.error("Error verifying ID token:", error);
+    res.status(401).send("Unauthorized");
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+// ---- Firebase Storage Set Up ----
+const fireStorageConfig = initializeStorageApp(firebaseConfig);
 console.log("Collection Name:", Berry.collection.name);
-const storage = getStorage(fireConfig);
+const storage = getStorage(fireStorageConfig);
 const storageRef = ref(storage); // points to the root of the Cloud Storage bucket.
 const folderRef = ref(storage, "images"); // points to 'images' folder.
 

@@ -24,3 +24,4 @@ yarn-error.log*
 
 # secure configs
 firebaseConfig.js
+config.js
