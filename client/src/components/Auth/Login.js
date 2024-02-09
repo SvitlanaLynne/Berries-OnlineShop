@@ -1,6 +1,7 @@
 import { useAuth } from "./AuthProvider";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import Url from "../../config";
 
 function Login() {
   const authContext = useAuth();
@@ -8,6 +9,35 @@ function Login() {
 
   const userRef = useRef();
   const pwdRef = useRef();
+
+  // ID token to the server
+  async function includeIdTokenInRequest(user) {
+    if (user) {
+      try {
+        // Retrieve the ID token
+        const idToken = await user.getIdToken(/* forceRefresh */ true);
+
+        // Include the ID token in the request to the server
+        const serverResponse = await fetch(`${Url}/auth`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${idToken}`,
+          },
+        });
+        if (!serverResponse.ok) {
+          const errorMessage = await serverResponse.text();
+          console.error(
+            `Error during sending the  ID Token. Status: ${serverResponse.status}, Message: ${errorMessage}`
+          );
+          window.alert(errorMessage);
+          return;
+        }
+      } catch (error) {
+        console.error("Error including ID token in the request:", error);
+      }
+    }
+  }
 
   const onAttemptLogin = async (e) => {
     e.preventDefault();
@@ -19,6 +49,9 @@ function Login() {
         pwdRef.current.value
       );
 
+      // Wait for the authentication state to be updated
+      // await new Promise((resolve) => setTimeout(resolve, 1000)); // Adjust the delay as needed
+
       // Check if successful before accessing credentials
       if (userCredential && userCredential.user) {
         const user = userCredential.user;
@@ -27,8 +60,8 @@ function Login() {
         console.log("EMAIL", email);
         console.log("emailVerified", emailVerified);
 
-        // Redirect after successful login
-        navigate("/home");
+        includeIdTokenInRequest(userCredential.user); // Include ID token after successful login
+        navigate("/home"); // Redirect after successful login
       } else {
         console.error("Unexpected response from Firebase:", userCredential);
         alert("An unexpected error occurred during login. Please try again.");
@@ -66,7 +99,7 @@ function Login() {
         <button className="loginBtn" onClick={onAttemptLogin}>
           Login
         </button>
-        <button  className="backBtn" onClick={() => navigate("/reset-password")}>
+        <button className="backBtn" onClick={() => navigate("/reset-password")}>
           Forgot my password
         </button>
       </form>

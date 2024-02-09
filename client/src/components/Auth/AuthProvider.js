@@ -6,53 +6,25 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import Url from "../../config";
 
 // set up initial context
 const AuthContext = createContext(null);
 
 // use the provider
-export function useAuth() {
+function useAuth() {
   return useContext(AuthContext);
 }
 
 // provider
 function AuthContextProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const value = { currentUser, logout, login, signup };
-
-  // ID token to the server
-  async function includeIdTokenInRequest(user) {
-    if (user) {
-      try {
-        // Retrieve the ID token
-        const idToken = await user.getIdToken(/* forceRefresh */ true);
-
-        // Include the ID token in the request to the server
-        const response = await fetch(`${Url}/auth`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${idToken}`,
-          },
-        });
-        const data = await response.json();
-        console.log("Server response:", data);
-      } catch (error) {
-        console.error("Error including ID token in the request:", error);
-      }
-    }
-  }
+  const value = { currentUser, logout, login, signup, isAuthenticated };
 
   // LOGIN
-  // function login(usr, pwd) {
-  //   return signInWithEmailAndPassword(auth, usr, pwd);
-  // }
-  async function login(usr, pwd) {
-    return signInWithEmailAndPassword(auth, usr, pwd).then((userCredential) => {
-      includeIdTokenInRequest(userCredential.user); // Include ID token after successful login
-    });
+  function login(usr, pwd) {
+    return signInWithEmailAndPassword(auth, usr, pwd);
   }
 
   // LOGOUT
@@ -62,23 +34,20 @@ function AuthContextProvider({ children }) {
 
   // SIGNUP
   async function signup(usr, pwd) {
-    return createUserWithEmailAndPassword(auth, usr, pwd).then(
-      (userCredential) => {
-        includeIdTokenInRequest(userCredential.user); // Include ID token after successful signup
-      }
-    );
+    return createUserWithEmailAndPassword(auth, usr, pwd);
   }
 
   useEffect(() => {
     // onAuthStateChanged returns a unsubscribe function
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       try {
-        if (user && user.id) {
+        if (user && user.uid) {
           setCurrentUser((user) => setCurrentUser(user));
-          includeIdTokenInRequest(user);
+          setIsAuthenticated(true);
         } else {
           console.log("No logged in users.");
           setCurrentUser(null);
+          setIsAuthenticated(false);
         }
       } catch (error) {
         console.log("Error in onAuthStateChanged:", error);
@@ -91,4 +60,4 @@ function AuthContextProvider({ children }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export default AuthContextProvider;
+export { AuthContextProvider, useAuth };

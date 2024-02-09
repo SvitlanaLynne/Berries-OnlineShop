@@ -1,10 +1,9 @@
 import express from "express";
 import { connectDB } from "./dbConnection.js";
 import Berry from "./model.js";
-import { initializeApp as initializeAdminApp } from "firebase-admin/app";
-import { admin } from "firebase-admin";
+// import { initializeApp as initializeAdminApp } from "firebase-admin/app";
 import { initializeApp as initializeStorageApp } from "firebase/app";
-import { readFileSync } from "fs";
+// import { readFileSync } from "fs";
 
 import firebaseConfig from "./firebase/firebaseConfig.js";
 import {
@@ -27,33 +26,26 @@ const multerStorage = multer.memoryStorage();
 const multerUpload = multer({ storage: multerStorage });
 
 // ---- Admin Access Set Up ----
-const path = "./firebase/berries-c3141-firebase-adminsdk-6hs4u-4789e65509.json";
-const fileContent = readFileSync(path, "utf8");
-const serviceAccount = JSON.parse(fileContent);
-
-admin.initializeAdminApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+// const path = "./firebase/berries-c3141-firebase-adminsdk-6hs4u-4789e65509.json";
+// const fileContent = readFileSync(path, "utf8");
+// const serviceAccount = JSON.parse(fileContent);
+// const authapp = initializeAdminApp(); // or initializeAdminApp(serviceAccount if using service account key, least secure option)
 
 // Receive token from the Authorization header
-app.post("/auth", async (req, res) => {
+router.post("/auth", async (req, res) => {
   try {
     const idToken = req.headers.authorization.split("Bearer ")[1];
 
     // Verify token
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    // const decodedToken = await admin.auth().verifyIdToken(idToken); //admin is not defined at this stage: Admin SDK not initiated
 
-    console.log("Decoded Token:", decodedToken);
-    res.status(200).send("ID token verification successful");
+    console.log("Token incoded:", idToken);
+    // console.log("Decoded Token:", decodedToken);
+    res.status(200).send("ID token recieved, not yet decoded");
   } catch (error) {
-    console.error("Error verifying ID token:", error);
+    console.error("Error reciving ID token:", error);
     res.status(401).send("Unauthorized");
   }
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
 });
 
 // ---- Firebase Storage Set Up ----
