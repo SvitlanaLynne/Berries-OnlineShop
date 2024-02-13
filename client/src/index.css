@@ -1,14 +1,90 @@
 @import "./components/import-Bar/ImportBar.css";
 @import "./components/products/Products.css";
 @import "./components/pages/home/Home.css";
+@import "./components/Auth/Login.css";
+@import "./components/Auth/AuthNav.css";
+
+@import url("https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:ital,wght@0,300;1,300&display=swap");
+
+:root {
+  --deep-purple: #695ea0;
+  --purple: #9085c1;
+  --light-purple: #beb6dd;
+  --deep-green: #25440b;
+  --dark-green: #427847;
+  --green: #399540;
+  --light-green: #5eb566;
+  --deep-red: #ff343d;
+  --red: #fe575f;
+  --light-red: #ff8c99;
+  --dark-brown: #2e1815;
+  --bright-brown: #540904;
+  --brown: #5f2511;
+  --grey: #546e7a;
+  --graphite: #37474f;
+  --contrast-grey: #263238;
+  /* --grey background */
+  --grey-background: #bbcacf;
+  --light-grey-background: #dedfde;
+  --lightlight-grey-background: #f4f4f4;
+
+  /* fonts */
+  --font-16: 1 rem;
+  --font-18: 1.125 rem;
+  --font-88: 5.5 rem;
+
+  /* misc */
+  --container: 2000px;
+}
+
+html {
+  box-sizing: border-box;
+  /* font-size: 100%; */
+  font-size: var(--font-88);
+  background: linear-gradient(
+    var(--light-purple) 0%,
+    var(--purple) 50%,
+    var(--deep-purple) 100%
+  );
+}
+
+*::before,
+*::after {
+  box-sizing: inherit;
+}
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.56 rem;
+  /* font-family: "Pacifico", cursive; */
+  font-family: "Roboto", "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
+    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  color: var(--deep-red);
+}
+
+.wrapper {
+  width: calc(100% - 2 rem);
+  max-width: var(--container);
+  height: 100vh;
+  margin: auto;
+  background-color: var(--light-grey-background);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+a {
+  font-size: inherit;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+a:hover {
+  color: var(--deep-green);
+}
+a:active {
+  color: var(--purple);
 }
 
 #filters {

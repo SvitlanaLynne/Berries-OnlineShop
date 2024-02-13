@@ -5,7 +5,7 @@ function AuthNav() {
   const authContext = useAuth();
 
   return (
-    <div>
+    <div id="auth-menu">
       {authContext.currentUser ? (
         <Link to="/logout">Logout</Link>
       ) : (

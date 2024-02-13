@@ -22,15 +22,20 @@ function App() {
   return (
     <BrowserRouter>
       <AuthContextProvider>
-        <Routes>
-          <Route path="/" element={<AuthNav />} />
-          {/* <Route path="/home" element={<ProtectedRoute element={<Home />} />} /> */}
-          <Route path="/home" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/logout" element={<Logout />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-        </Routes>
+        <div className="wrapper">
+          <Routes>
+            <Route path="/" element={<AuthNav />} />
+            <Route
+              path="/home"
+              element={<ProtectedRoute element={<Home />} />}
+            />
+            {/* <Route path="/home" element={<Home />} /> */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/logout" element={<Logout />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+          </Routes>
+        </div>
       </AuthContextProvider>
     </BrowserRouter>
   );
