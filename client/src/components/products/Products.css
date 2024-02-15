@@ -1,10 +1,14 @@
-#main-Container {
+#main-container {
+  width: 100%;
+  height: auto;
+  outline: 2px solid rgb(223, 149, 0);
+}
+#import-options-group {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  width: 100vw;
-  height: 100vh;
-  outline: 2px solid rgb(255, 196, 78);
+  height: calc(var(--line-height) * 2);
+
+  background-color: aquamarine;
 }
 .modalWindow {
   display: none;
@@ -27,7 +31,7 @@
   text-align: center;
 }
 
-#Products-Container {
+#products-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -49,7 +53,7 @@
 }
 
 table {
-  width: 50%;
+  width: 100%;
   border-collapse: collapse;
 }
 td,
@@ -58,6 +62,10 @@ th {
   text-align: center;
 }
 
-#form {
+#add-product-form {
+  width: 100%;
   outline: 4px solid lightsalmon;
+}
+#filters {
+  outline: 2px solid green;
 }

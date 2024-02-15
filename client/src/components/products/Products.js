@@ -597,7 +597,7 @@ function Products() {
   //------ RETURN ------
 
   return (
-    <div id="main-Container">
+    <div id="main-container">
       {/* ---------- import bar ---------- */}
 
       <ImportBar addForm={addForm} addImportOptions={addImportOptions} />
@@ -614,7 +614,7 @@ function Products() {
         ""
       )}
 
-      <main id="Products-Container">
+      <main id="products-container">
         {/* // ----------a window appears ------------- */}
         <div id="fileUploadWindow" className="modalWindow">
           <span className="closeX" onClick={() => closeUploadWindow()}>
@@ -732,7 +732,7 @@ function Products() {
             </thead>
             <tbody>
               {formShown === true ? (
-                <tr id="form">
+                <tr id="add-product-form">
                   {/* ---------- form ---------- */}
                   <td>-</td>
                   <td>

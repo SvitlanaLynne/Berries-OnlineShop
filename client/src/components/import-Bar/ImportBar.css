@@ -1,7 +1,7 @@
-#ImportBar-Container {
+#import-bar-container {
   display: flex;
-  justify-content: space-between;
-  outline: 1px solid grey;
+
+  outline: 2px solid grey;
 }
 #import-buttons-group {
   outline: 5px solid pink;

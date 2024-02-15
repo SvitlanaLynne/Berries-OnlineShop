@@ -1,6 +1,7 @@
 import { useAuth } from "./AuthProvider";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function SignUp() {
   const authContext = useAuth();
@@ -41,16 +42,24 @@ function SignUp() {
   };
 
   return (
-    <div id="loginContainer">
-      <button onClick={() => navigate("/")}>Back</button>
-      <span id="loginLabel">Sign Up</span>
-      <form>
+    <div className="login-container">
+      <Link className="back-link" to="/">
+        &#8592; Back
+      </Link>
+      <form className="form-login">
+        <span>Sign Up</span>
         <input
+          className="form-input"
           placeholder="youremail@email.com"
           type="text"
           ref={userRef}
         ></input>
-        <input type="text" placeholder="password" ref={pwdRef}></input>
+        <input
+          className="form-input"
+          type="text"
+          placeholder="password"
+          ref={pwdRef}
+        ></input>
         <button className="loginBtn" onClick={onAttemptSignUp}>
           Sign Up
         </button>

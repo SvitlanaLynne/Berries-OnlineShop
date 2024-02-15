@@ -1,6 +1,7 @@
 import { useAuth } from "./AuthProvider";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Url from "../../config";
 
 function Login() {
@@ -49,9 +50,6 @@ function Login() {
         pwdRef.current.value
       );
 
-      // Wait for the authentication state to be updated
-      // await new Promise((resolve) => setTimeout(resolve, 1000)); // Adjust the delay as needed
-
       // Check if successful before accessing credentials
       if (userCredential && userCredential.user) {
         const user = userCredential.user;
@@ -86,23 +84,29 @@ function Login() {
   };
 
   return (
-    <div id="loginContainer">
-      <button onClick={() => navigate("/")}>Back</button>
-      <span id="loginLabel">Login</span>
-      <form>
+    <div className="login-container">
+      <Link className="back-link" to="/">
+        &#8592; Back
+      </Link>
+      <form className="form-login">
+        <span>Login</span>
         <input
+          className="form-input"
           placeholder="youremail@email.com"
           type="text"
           ref={userRef}
         ></input>
-        <input type="text" placeholder="password" ref={pwdRef}></input>
+        <input
+          className="form-input"
+          type="text"
+          placeholder="password"
+          ref={pwdRef}
+        ></input>
         <button className="loginBtn" onClick={onAttemptLogin}>
           Login
         </button>
-        <button className="backBtn" onClick={() => navigate("/reset-password")}>
-          Forgot my password
-        </button>
       </form>
+      <Link to="/reset-password">Forgot my password</Link>
     </div>
   );
 }

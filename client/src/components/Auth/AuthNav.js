@@ -5,13 +5,16 @@ function AuthNav() {
   const authContext = useAuth();
 
   return (
-    <div id="auth-menu">
-      {authContext.currentUser ? (
-        <Link to="/logout">Logout</Link>
-      ) : (
-        <Link to="/login">Login</Link>
-      )}
-      {authContext.currentUser ? null : <Link to="/signup"> SignUp </Link>}
+    <div id="landing-page-container">
+      <canvas></canvas>
+      <nav>
+        {authContext.currentUser ? (
+          <Link to="/logout">Logout</Link>
+        ) : (
+          <Link to="/login">Login</Link>
+        )}
+        {authContext.currentUser ? null : <Link to="/signup"> SignUp </Link>}
+      </nav>
     </div>
   );
 }

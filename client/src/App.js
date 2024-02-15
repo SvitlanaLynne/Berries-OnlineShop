@@ -9,14 +9,14 @@ import SignUp from "./components/Auth/SignUp";
 import ResetPassword from "./components/Auth/ResetPassword";
 import AuthNav from "./components/Auth/AuthNav";
 
-const ProtectedRoute = ({ element }) => {
-  const { isAuthenticated } = useAuth(); // Use useAuth hook to access isAuthenticated
-  return isAuthenticated ? (
-    element
-  ) : (
-    <Navigate to="/login" replace state={{ from: window.location.pathname }} />
-  );
-};
+// const ProtectedRoute = ({ element }) => {
+//   const { isAuthenticated } = useAuth(); // Use useAuth hook to access isAuthenticated
+//   return isAuthenticated ? (
+//     element
+//   ) : (
+//     <Navigate to="/login" replace state={{ from: window.location.pathname }} />
+//   );
+// };
 
 function App() {
   return (
@@ -25,11 +25,11 @@ function App() {
         <div className="wrapper">
           <Routes>
             <Route path="/" element={<AuthNav />} />
-            <Route
+            {/* <Route
               path="/home"
               element={<ProtectedRoute element={<Home />} />}
-            />
-            {/* <Route path="/home" element={<Home />} /> */}
+            /> */}
+            <Route path="/home" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/logout" element={<Logout />} />
             <Route path="/signup" element={<SignUp />} />

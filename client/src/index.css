@@ -3,6 +3,7 @@
 @import "./components/pages/home/Home.css";
 @import "./components/Auth/Login.css";
 @import "./components/Auth/AuthNav.css";
+@import "./components/Auth/ResetPassword.css";
 
 @import url("https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:ital,wght@0,300;1,300&display=swap");
 
@@ -32,6 +33,8 @@
   --font-16: 1 rem;
   --font-18: 1.125 rem;
   --font-88: 5.5 rem;
+  /* --line-height: 5rem; */
+  --line-height: clamp(1.25rem, 1.56rem, 2rem);
 
   /* misc */
   --container: 2000px;
@@ -39,7 +42,7 @@
 
 html {
   box-sizing: border-box;
-  /* font-size: 100%; */
+  font-size: 100%;
   font-size: var(--font-88);
   background: linear-gradient(
     var(--light-purple) 0%,
@@ -55,38 +58,42 @@ html {
 
 body {
   margin: 0;
-  line-height: 1.56 rem;
+
+  font-size: 1rem;
+  font-size: clamp(1rem, 0.94rem + 0.26vw, 1.25rem);
+  line-height: clamp(1.25rem, 1.56rem, 2rem);
   /* font-family: "Pacifico", cursive; */
   font-family: "Roboto", "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
     "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-  color: var(--deep-red);
+
+  color: var(--graphite);
 }
 
 .wrapper {
-  width: calc(100% - 2 rem);
+  width: calc(100vw - 2rem);
   max-width: var(--container);
   height: 100vh;
   margin: auto;
-  background-color: var(--light-grey-background);
+
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
+  background-color: var(--light-grey-background);
+  outline: #c3117e 4px solid;
 }
 
+/* STANDARD ELEMENTS */
 a {
   font-size: inherit;
   color: inherit;
   text-decoration: none;
+  padding: var(--line-height) calc(var(--line-height) * 1.5);
   cursor: pointer;
 }
 a:hover {
-  color: var(--deep-green);
+  color: var(--green);
 }
 a:active {
   color: var(--purple);
 }
 
-#filters {
-  outline: 1px solid green;
-}

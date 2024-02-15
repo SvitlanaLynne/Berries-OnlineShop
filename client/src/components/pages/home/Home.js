@@ -1,11 +1,13 @@
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Products from "../../products";
 
 function Home() {
-  const navigate = useNavigate();
   return (
-    <div>
-      <button onClick={() => navigate("/logout")}>Logout</button>
+    <div id="home-container">
+      <Link id="logout" to="/">
+        Logout
+      </Link>
+      <img id="small-logo" src="" alt="Berries Project Logo" />
       <Products />
     </div>
   );
