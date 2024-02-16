@@ -598,7 +598,7 @@ function Products() {
 
   return (
     <div id="main-container">
-      {/* ---------- import bar ---------- */}
+      {/* ---------- IMPORT BAR ---------- */}
 
       <ImportBar addForm={addForm} addImportOptions={addImportOptions} />
       {importShown === true ? (
@@ -615,6 +615,218 @@ function Products() {
       )}
 
       <main id="products-container">
+        {/* ---------- filters ---------- */}
+        <aside id="filters">Filter Block</aside>
+
+        {/* ---------- TABLE ---------- */}
+        {/* ------- head ------- */}
+        {isLoading === true ? (
+          <span>Loading...</span>
+        ) : (
+          <table>
+            <col id="col-checkbox" />
+            <col id="col-image" />
+            <col id="col-name" />
+            <col id="col-in-stock" />
+            <col id="col-kg" />
+            <col id="col-price" />
+            <col id="col-buttons" />
+            <thead>
+              <tr>
+                <th>
+                  <input type="checkbox" />
+                </th>
+                {/* ------- action menu ------- */}
+                <th>
+                  <div id="action-button-group">
+                    <label id="action-button" onClick={() => showDropDown()}>
+                      Action
+                    </label>
+                    {actionDropDownShown ? (
+                      <select onChange={handleActionChange}>
+                        <option></option>
+                        <option>Bulk Edit</option>
+                        <option>Delete</option>
+                        <option>Delete All</option>
+                      </select>
+                    ) : (
+                      ""
+                    )}
+                  </div>
+                </th>
+                {/* --------------------------- */}
+                <th>Name</th>
+                <th>In Stock</th>
+                <th>Kg</th>
+                <th>Price</th>
+                <th></th>
+              </tr>
+            </thead>
+            {/* ------- body ------- */}
+            <tbody>
+              {/* ---------- add product form ---------- */}
+              {formShown === true ? (
+                <tr id="add-product-form">
+                  <td></td>
+                  <td>
+                    <input
+                      type="file"
+                      multiple
+                      onChange={handleImagesSelection}
+                    ></input>
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      placeholder="Blueberry"
+                      required
+                    />
+                  </td>
+                  <td>In Stock status</td>
+                  <td>
+                    <input
+                      type="number"
+                      name="kg"
+                      value={formData.kg}
+                      onChange={handleInputChange}
+                      placeholder="1"
+                      required
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      name="price"
+                      value={formData.price}
+                      onChange={handleInputChange}
+                      placeholder="8"
+                      required
+                    />
+                  </td>
+                  <td>
+                    <button onClick={() => handleProductUpload()}>
+                      Submit
+                    </button>
+                    <button onClick={() => setFormShown(false)}>Cancel</button>
+                  </td>
+                </tr>
+              ) : (
+                ""
+              )}
+
+              {/* ---------- products ---------- */}
+              {data.map((product) => {
+                return isEditing === product._id ? (
+                  <tr key={product._id} id="form">
+                    {/* ---------- edit form ---------- */}
+                    <td></td>
+                    <td>
+                      <input
+                        type="file"
+                        multiple
+                        onChange={handleImagesSelection}
+                      ></input>
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        name="name"
+                        value={editFormData.name}
+                        onChange={handleEditChange}
+                        required
+                      />
+                    </td>
+                    <td>In Stock status</td>
+                    <td>
+                      <input
+                        type="number"
+                        name="kg"
+                        value={editFormData.kg}
+                        onChange={handleEditChange}
+                        required
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        name="price"
+                        value={editFormData.price}
+                        onChange={handleEditChange}
+                        required
+                      />
+                    </td>
+                    <td>
+                      <button onClick={() => productEdit(product._id)}>
+                        Submit
+                      </button>
+                      <button onClick={() => setIsEditing(null)}>Cancel</button>
+                    </td>
+                  </tr>
+                ) : (
+                  //  -------------------------------------
+                  <tr key={product._id}>
+                    <td>
+                      <div id="check-box-group">
+                        <input
+                          type="checkbox"
+                          checked={checkedItems.includes(product._id)}
+                          onChange={() => handleCheckedChange(product._id)}
+                        />
+                      </div>
+                    </td>
+                    <td>
+                      {product.images.map((imgUrl, index) => {
+                        if (
+                          imgUrl.includes(`${product.name + ".jpg"}`) ||
+                          imgUrl.includes(
+                            `${product.name.toLowerCase() + ".jpg"}`
+                          )
+                        ) {
+                          return (
+                            <img
+                              key={`${product._id}-${index}`}
+                              src={imgUrl}
+                              alt={`${product.name} ${index + 1}`}
+                            />
+                          );
+                        }
+                        return null;
+                      })}
+                    </td>
+                    <td>{product.name}</td>
+                    <td>
+                      {product.availability === true ? (
+                        <span>Available</span>
+                      ) : (
+                        <span>Out of Stock</span>
+                      )}
+                    </td>
+                    <td>{product.kg}</td>
+                    <td>{product.price}</td>
+                    <td>
+                      <button onClick={() => enableEdit(product._id)}>
+                        Edit
+                      </button>
+                      <button onClick={() => Delete(product._id)}>
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+        <aside></aside>
+        {pageLoading && <span>Loading...</span>}
+        {!pageLoading && productsLoaded < totalProducts && (
+          <button onClick={() => handleLoadMore()} disabled={pageLoading}>
+            Load More
+          </button>
+        )}
         {/* // ----------a window appears ------------- */}
         <div id="fileUploadWindow" className="modalWindow">
           <span className="closeX" onClick={() => closeUploadWindow()}>
@@ -693,208 +905,6 @@ function Products() {
             <button onClick={() => closeBulkEditWindow()}>Cancel</button>
           </div>
         </div>
-        {/* ---------- filters ---------- */}
-        <aside id="filters">Filter Block</aside>
-
-        {/* ---------- table ---------- */}
-        {isLoading === true ? (
-          <span>Loading...</span>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>
-                  <input type="checkbox" />
-                </th>
-                <th>
-                  <div id="action-button-group">
-                    <label id="action-button" onClick={() => showDropDown()}>
-                      Action
-                    </label>
-                    {actionDropDownShown ? (
-                      <select onChange={handleActionChange}>
-                        <option></option>
-                        <option>Bulk Edit</option>
-                        <option>Delete</option>
-                        <option>Delete All</option>
-                      </select>
-                    ) : (
-                      ""
-                    )}
-                  </div>
-                </th>
-                <th>Name</th>
-                <th>In Stock</th>
-                <th>Kg</th>
-                <th>Price</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {formShown === true ? (
-                <tr id="add-product-form">
-                  {/* ---------- form ---------- */}
-                  <td>-</td>
-                  <td>
-                    <input
-                      type="file"
-                      multiple
-                      onChange={handleImagesSelection}
-                    ></input>
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      placeholder="Blueberry"
-                      required
-                    />
-                  </td>
-                  <td>In Stock status</td>
-                  <td>
-                    <input
-                      type="number"
-                      name="kg"
-                      value={formData.kg}
-                      onChange={handleInputChange}
-                      placeholder="1"
-                      required
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      name="price"
-                      value={formData.price}
-                      onChange={handleInputChange}
-                      placeholder="8"
-                      required
-                    />
-                  </td>
-                  <td>
-                    <button onClick={() => handleProductUpload()}>
-                      Submit
-                    </button>
-                    <button onClick={() => setFormShown(false)}>Cancel</button>
-                  </td>
-                </tr>
-              ) : (
-                ""
-              )}
-
-              {/* ---------- products ---------- */}
-              {data.map((product) => {
-                // console.log("PRODUCT ID", product._id);
-                return isEditing === product._id ? (
-                  <tr key={product._id} id="form">
-                    {/* ---------- inline form ---------- */}
-                    <td>-</td>
-                    <td>
-                      <input
-                        type="file"
-                        multiple
-                        onChange={handleImagesSelection}
-                      ></input>
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        name="name"
-                        value={editFormData.name}
-                        onChange={handleEditChange}
-                        required
-                      />
-                    </td>
-                    <td>In Stock status</td>
-                    <td>
-                      <input
-                        type="number"
-                        name="kg"
-                        value={editFormData.kg}
-                        onChange={handleEditChange}
-                        required
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="number"
-                        name="price"
-                        value={editFormData.price}
-                        onChange={handleEditChange}
-                        required
-                      />
-                    </td>
-                    <td>
-                      <button onClick={() => productEdit(product._id)}>
-                        Submit
-                      </button>
-                      <button onClick={() => setIsEditing(null)}>Cancel</button>
-                    </td>
-                  </tr>
-                ) : (
-                  //  ---------- non-edited items ----------
-                  <tr key={product._id}>
-                    <td>
-                      <div id="check-box-group">
-                        <input
-                          type="checkbox"
-                          checked={checkedItems.includes(product._id)}
-                          onChange={() => handleCheckedChange(product._id)}
-                        />
-                      </div>
-                    </td>
-                    <td>
-                      {product.images.map((imgUrl, index) => {
-                        if (
-                          imgUrl.includes(`${product.name + ".jpg"}`) ||
-                          imgUrl.includes(
-                            `${product.name.toLowerCase() + ".jpg"}`
-                          )
-                        ) {
-                          return (
-                            <img
-                              key={`${product._id}-${index}`}
-                              src={imgUrl}
-                              alt={`${product.name} ${index + 1}`}
-                            />
-                          );
-                        }
-                        return null;
-                      })}
-                    </td>
-                    <td>{product.name}</td>
-                    <td>
-                      {product.availability === true ? (
-                        <span>Available</span>
-                      ) : (
-                        <span>Out of Stock</span>
-                      )}
-                    </td>
-                    <td>{product.kg}</td>
-                    <td>{product.price}</td>
-                    <td>
-                      <button onClick={() => enableEdit(product._id)}>
-                        Edit
-                      </button>
-                      <button onClick={() => Delete(product._id)}>
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-        <aside></aside>
-        {pageLoading && <span>Loading...</span>}
-        {!pageLoading && productsLoaded < totalProducts && (
-          <button onClick={() => handleLoadMore()} disabled={pageLoading}>
-            Load More
-          </button>
-        )}
       </main>
     </div>
   );
