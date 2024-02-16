@@ -4,13 +4,6 @@
 
   outline: 2px solid rgb(223, 149, 0);
 }
-#import-options-group {
-  display: flex;
-  align-items: center;
-  height: calc(var(--line-height) * 2);
-
-  background-color: aquamarine;
-}
 
 #products-container {
   width: 100%;
@@ -20,44 +13,99 @@
   outline: 5px solid grey;
 }
 
-/* TABLE */
+/* --------- TABLE --------- */
 
 table {
   width: 100%;
   border-collapse: collapse;
+
+  margin-bottom: 1.5rem;
 }
 #col-checkbox {
   width: 4%;
 }
-#col-image,
-#col-name {
+
+#col-name,
+#col-buttons {
   width: 28%;
 }
 #col-in-stock,
+#col-image,
 #col-kg,
-#col-price,
-#col-buttons {
+#col-price {
   width: 10%;
 }
 
 td,
 th {
-  height: 2rem;
-  border: 1px solid lightblue;
+  height: calc(1rem + 1vmin);
+  max-width: 0; /*  allow resizing less than content */
   text-align: center;
 
   overflow: hidden;
   white-space: normal;
   text-overflow: ellipsis;
-  max-width: 0;
+
+  border: 1px solid lightblue;
 }
 
 td img {
+  margin: auto;
   max-width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
 }
 
+#edit-delete-buttons-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+#edit-delete-buttons-group button {
+  margin: 0% 3%;
+}
+/* ------------------------------------- */
+
+/* --------- ADD FORM --------- */
+#add-product-form {
+  width: 100%;
+  height: calc(var(--current-font-size) * 4);
+  outline: 4px solid lightsalmon;
+}
+#add-product-form input {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 50%;
+  border: none;
+  font: inherit;
+  color: inherit;
+  text-align: center;
+  background-color: var(--lightlight-grey-background);
+}
+
+#file-choose {
+  font-style: italic;
+  font-size: calc(var(--current-font-size) * 0.9);
+}
+#submit-cancel-buttons-group {
+  display: flex;
+  justify-content: space-between;
+}
+#submit-cancel-buttons-group button {
+  margin: 0% 3%;
+}
+
+/* --------- IMPORT --------- */
+#import-options-group {
+  display: flex;
+  align-items: center;
+  height: calc(var(--current-font-size) * 4);
+
+  background-color: aquamarine;
+}
+
+/* --------- ACTION --------- */
 #action-button {
   width: 1 rem;
   height: 2 rem;
@@ -72,15 +120,11 @@ td img {
   /* margin: 0 auto; */
 }
 
-#add-product-form {
-  width: 100%;
-  outline: 4px solid lightsalmon;
-}
 #filters {
   outline: 2px solid green;
 }
 
-/* MODAL WINDOWS */
+/* --------- MODAL WINDOWS --------- */
 .modalWindow {
   display: none;
   flex-direction: column;
@@ -88,16 +132,56 @@ td img {
   justify-content: center;
   position: fixed; /* prevent scrolling away*/
 
-  width: 40%;
-  height: 40%;
+  width: 50%;
+  height: 25%;
   max-height: 600px;
+  max-width: 600px;
   background-color: rgba(25, 171, 224, 0.5);
   z-index: 2;
+}
+
+@media (max-width: 600px) {
+  .modalWindow {
+    width: 100%;
+  }
+}
+.modal-window-content-container {
+  width: calc(100% - 2rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  outline: 2px solid rgb(33, 14, 123);
+}
+.modal-window-content-container span {
+  margin-bottom: 2rem;
+}
+.modal-window-buttons-group {
+  margin-top: calc(var(--current-font-size) * 3);
 }
 .closeX {
   width: 30px;
   height: 30px;
   background-color: blanchedalmond;
-  align-self: flex-end;
   text-align: center;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.closeX:hover {
+  cursor: pointer;
+}
+
+/* --- modal window Edit Bulk --- */
+
+#kg-price-input-group {
+  width: 100%;
+
+  display: flex;
+  justify-content: space-around;
+
+  outline: 1px rgb(103, 1, 77) solid;
+}
+
+#kg-price-input-group input {
+  margin: 0 5px;
 }

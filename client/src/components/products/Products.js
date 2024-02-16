@@ -669,11 +669,13 @@ function Products() {
                 <tr id="add-product-form">
                   <td></td>
                   <td>
-                    <input
-                      type="file"
-                      multiple
-                      onChange={handleImagesSelection}
-                    ></input>
+                    <div id="file-choose">
+                      <input
+                        type="file"
+                        multiple
+                        onChange={handleImagesSelection}
+                      ></input>
+                    </div>
                   </td>
                   <td>
                     <input
@@ -685,7 +687,7 @@ function Products() {
                       required
                     />
                   </td>
-                  <td>In Stock status</td>
+                  <td></td>
                   <td>
                     <input
                       type="number"
@@ -707,10 +709,14 @@ function Products() {
                     />
                   </td>
                   <td>
-                    <button onClick={() => handleProductUpload()}>
-                      Submit
-                    </button>
-                    <button onClick={() => setFormShown(false)}>Cancel</button>
+                    <div id="submit-cancel-buttons-group">
+                      <button onClick={() => handleProductUpload()}>
+                        Submit
+                      </button>
+                      <button onClick={() => setFormShown(false)}>
+                        Cancel
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ) : (
@@ -807,12 +813,12 @@ function Products() {
                     <td>{product.kg}</td>
                     <td>{product.price}</td>
                     <td>
-                      <button onClick={() => enableEdit(product._id)}>
-                        Edit
-                      </button>
-                      <button onClick={() => Delete(product._id)}>
-                        Delete
-                      </button>
+                      <div id="edit-delete-buttons-group">
+                        <button onClick={() => enableEdit(product._id)}>
+                          Edit
+                        </button>
+                        <button onClick={() => Delete(product._id)}>X</button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -827,83 +833,108 @@ function Products() {
             Load More
           </button>
         )}
-        {/* // ----------a window appears ------------- */}
+        {/* // ----------a window appears "Import from File" ------------- */}
         <div id="fileUploadWindow" className="modalWindow">
           <span className="closeX" onClick={() => closeUploadWindow()}>
             &times;
           </span>
-          <div>
+          <form className="modal-window-content-container">
+            <span>Bulk Import from File</span>
             <input
               type="file"
               accept=".csv"
               onChange={handleCSVSelection}
             ></input>
-            <button onClick={() => importProductsFromFile()}>Upload</button>
-          </div>
+            <button
+              className="modal-window-buttons-group"
+              onClick={() => importProductsFromFile()}
+            >
+              Upload
+            </button>
+          </form>
         </div>
-        {/* ------------- a window appears ------------- */}
+        {/* ------------- a window appears "Import Bulk Images" ------------- */}
         <div id="imagesUploadWindow" className="modalWindow">
           <span className="closeX" onClick={() => closeImagesUploadWindow()}>
             &times;
           </span>
-          <div>
+          <form className="modal-window-content-container">
+            <span>Import Bulk Images</span>
             <input
               type="file"
               multiple
               onChange={handleImagesSelection}
             ></input>
-            <button onClick={() => importBulkImages()}>Submit</button>
-          </div>
+            <button
+              className="modal-window-buttons-group"
+              onClick={() => importBulkImages()}
+            >
+              Submit
+            </button>
+          </form>
         </div>
-        {/* ------------- a window appears ------------- */}
+        {/* ------------- a window appears "Delete one confirmation" ------------- */}
         <div id="deleteProductWindow" className="modalWindow">
           <span className="closeX" id="closeModal">
             &times;
           </span>
-          <div>
+          <div className="modal-window-content-container">
             <span>Are you sure you'd like to delete this item?</span>
-            <button id="deleteButton">Delete</button>
-            <button id="cancelButton">Cancel</button>
+            <div className="modal-window-buttons-group">
+              <button id="deleteButton">Delete</button>
+              <button id="cancelButton">Cancel</button>
+            </div>
           </div>
         </div>
-        {/* ------------- a window appears ------------- */}
+        {/* ------------- a window appears "Delete Bulk confirmation" ------------- */}
         <div id="bulkDeleteWindow" className="modalWindow">
           <span className="closeX" id="bulkDelCloseModal">
             &times;
           </span>
-          <div>
+          <div className="modal-window-content-container">
             <span>
               You are about to delete selected items. Please confirm to proceed.
             </span>
-            <button id="bulkDeleteButton">Delete</button>
-            <button id="bulkCancelButton">Cancel</button>
+            <div className="modal-window-buttons-group">
+              <button id="bulkDeleteButton">Delete</button>
+              <button id="bulkCancelButton">Cancel</button>
+            </div>
           </div>
         </div>
-        {/* ------------- a window appears ------------- */}
+        {/* ------------- a window appears "Edit Bulk" ------------- */}
         <div id="bulkEditWindow" className="modalWindow">
           <span className="closeX" onClick={() => closeBulkEditWindow()}>
             &times;
           </span>
-          <div>
-            <label>Kg</label>
-            <input
-              type="number"
-              name="kg"
-              value={bulkEditForm.kg}
-              onChange={handleBulkChange}
-              placeholder="1"
-            />
-            <label>Price</label>
-            <input
-              type="number"
-              name="price"
-              value={bulkEditForm.price}
-              onChange={handleBulkChange}
-              placeholder="8"
-            />
-            <button onClick={() => bulkEdit()}>Submit</button>
-            <button onClick={() => closeBulkEditWindow()}>Cancel</button>
-          </div>
+          <span>Bulk Edit</span>
+          <form className="modal-window-content-container">
+            <div id="kg-price-input-group">
+              <div>
+                <label>Kg</label>
+                <input
+                  type="number"
+                  name="kg"
+                  value={bulkEditForm.kg}
+                  onChange={handleBulkChange}
+                  placeholder="1"
+                />
+              </div>
+              <div>
+                <label>Price</label>
+                <input
+                  type="number"
+                  name="price"
+                  value={bulkEditForm.price}
+                  onChange={handleBulkChange}
+                  placeholder="8"
+                />
+              </div>
+            </div>
+            <div className="modal-window-buttons-group">
+              <button onClick={() => bulkEdit()}>Submit</button>
+              <button onClick={() => closeBulkEditWindow()}>Cancel</button>
+            </div>
+          </form>
         </div>
       </main>
     </div>

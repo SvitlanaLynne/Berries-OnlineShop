@@ -30,9 +30,11 @@
   --lightlight-grey-background: #f4f4f4;
 
   /* fonts */
-  --font-16: 1 rem;
-  --font-18: 1.125 rem;
-  --font-88: 5.5 rem;
+  --font-14: 0.875rem;
+  --font-16: 1rem;
+  --font-18: 1.125rem;
+  --font-88: 5.5rem;
+  --current-font-size: clamp(0.75rem, 0.7rem + 0.25vw, 1rem);
   /* --line-height: 5rem; */
   --line-height: clamp(1.25rem, 1.56rem, 2rem);
 
@@ -43,7 +45,6 @@
 html {
   box-sizing: border-box;
   font-size: 100%;
-  font-size: var(--font-88);
   background: linear-gradient(
     var(--light-purple) 0%,
     var(--purple) 50%,
@@ -58,9 +59,7 @@ html {
 
 body {
   margin: 0;
-
-  font-size: 1rem;
-  font-size: clamp(1rem, 0.94rem + 0.26vw, 1.25rem);
+  font-size: var(--current-font-size);
   line-height: clamp(1.25rem, 1.56rem, 2rem);
   /* font-family: "Pacifico", cursive; */
   font-family: "Roboto", "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
