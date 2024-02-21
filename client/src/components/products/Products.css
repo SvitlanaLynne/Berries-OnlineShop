@@ -2,7 +2,7 @@
   width: 100%;
   height: auto;
 
-  outline: 2px solid rgb(223, 149, 0);
+  /* outline: 2px solid rgb(223, 149, 0); */
 }
 
 #products-container {
@@ -10,7 +10,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  outline: 5px solid grey;
+  /* outline: 5px solid grey; */
 }
 
 /* --------- TABLE --------- */
@@ -36,9 +36,29 @@ table {
 #col-price {
   width: 10%;
 }
+/*--- head ---*/
+thead tr {
+  background-color: transparent;
+}
 
-tr:not(:first-child) {
-  box-shadow: -3px 0px 6px 2px rgba(0, 0, 0, 0.05);
+thead tr:hover {
+  background-color: transparent;
+}
+
+th {
+  font-weight: bold;
+  font-size: calc(var(--current-font-size) * 0.8);
+  color: var(--graphite);
+}
+
+/*--- body ---*/
+tr {
+  background-color: var(--lightlight-grey-background);
+}
+
+tr:hover {
+  background-color: var(--bluish-light-grey-background);
+  transition: background-color 850ms ease-in-out;
 }
 
 #first-td {
@@ -88,7 +108,10 @@ td img {
 #add-product-form {
   width: 100%;
   height: calc(var(--current-font-size) * 4);
-  outline: 4px solid lightsalmon;
+  /* outline: 4px solid lightsalmon; */
+}
+#add-product-form:hover {
+  background-color: transparent;
 }
 #add-product-form input {
   margin: 0;
@@ -98,14 +121,22 @@ td img {
   border: none;
   font: inherit;
   color: inherit;
+  border-radius: var(--corner-radius-7);
   text-align: center;
   background-color: var(--lightlight-grey-background);
 }
 
-#file-choose {
+#file-choose input[type="file"] {
+  all: unset;
+  display: flex;
+  flex-direction: column;
+
+  font: inherit;
   font-style: italic;
   font-size: calc(var(--current-font-size) * 0.9);
+  background-color: transparent;
 }
+
 #submit-cancel-buttons-group {
   display: flex;
   justify-content: space-between;
@@ -125,9 +156,6 @@ td img {
 
 /* --------- ACTION --------- */
 #action-button {
-  width: 1 rem;
-  height: 2 rem;
-  border-radius: 5px;
   background-color: cornflowerblue;
 }
 
@@ -135,11 +163,21 @@ td img {
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* margin: 0 auto; */
+}
+
+#action-button-group select {
+  background-color: aqua;
+}
+option {
+  font-family: "Roboto", "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
+    "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-size: var(--current-font-size);
+  background: #1b1a1a !important;
+  color: #357b1d !important;
 }
 
 #filters {
-  outline: 2px solid green;
+  /* outline: 2px solid green; */
 }
 
 #delete-button {
@@ -176,7 +214,7 @@ td img {
   display: flex;
   flex-direction: column;
   align-items: center;
-  outline: 2px solid rgb(33, 14, 123);
+  /* outline: 2px solid rgb(33, 14, 123); */
 }
 .modal-window-content-container span {
   margin-bottom: 2rem;
@@ -205,7 +243,7 @@ td img {
   display: flex;
   justify-content: space-around;
 
-  outline: 1px rgb(103, 1, 77) solid;
+  /* outline: 1px rgb(103, 1, 77) solid; */
 }
 
 #kg-price-input-group input {

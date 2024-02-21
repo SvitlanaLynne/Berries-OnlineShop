@@ -1,8 +1,8 @@
 #import-bar-container {
   display: flex;
 
-  outline: 2px solid grey;
+  /* outline: 2px solid grey; */
 }
 #import-buttons-group {
-  outline: 5px solid pink;
+  /* outline: 5px solid pink; */
 }

@@ -616,7 +616,7 @@ function Products() {
 
       <main id="products-container">
         {/* ---------- filters ---------- */}
-        <aside id="filters">Filter Block</aside>
+        {/* <aside id="filters">Filter Block</aside> */}
 
         {/* ---------- TABLE ---------- */}
         {/* ------- head ------- */}
@@ -633,15 +633,15 @@ function Products() {
             <col id="col-buttons" />
             <thead>
               <tr>
-                <th>
+                <th className="header">
                   <input type="checkbox" />
                 </th>
                 {/* ------- action menu ------- */}
                 <th>
                   <div id="action-button-group">
-                    <label id="action-button" onClick={() => showDropDown()}>
+                    <button id="action-button" onClick={() => showDropDown()}>
                       Action
-                    </label>
+                    </button>
                     {actionDropDownShown ? (
                       <select onChange={handleActionChange}>
                         <option></option>

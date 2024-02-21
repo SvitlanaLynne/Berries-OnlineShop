@@ -21,13 +21,22 @@
   --dark-brown: #2e1815;
   --bright-brown: #540904;
   --brown: #5f2511;
-  --grey: #546e7a;
+  --grey: #c0c4c6;
   --graphite: #37474f;
   --contrast-grey: #263238;
-  /* --grey background */
+  /* grey background */
+  --bluish-grey-background: #bbcacf;
+  --bluish-light-grey-background: #e9eef0;
   --grey-background: #bbcacf;
   --light-grey-background: #dedfde;
-  --lightlight-grey-background: #f4f4f4;
+  --lightlight-grey-background: #e4e4e4;
+  /* gradients */
+  --green-range: linear-gradient(
+    0deg,
+    rgba(39, 57, 9, 1) 0%,
+    rgba(49, 108, 16, 1) 22%,
+    rgba(197, 204, 149, 1) 100%
+  );
 
   /* fonts */
   --font-14: 0.875rem;
@@ -40,18 +49,15 @@
 
   /* misc */
   --container: 2000px;
-  --corner-radius-12: 12%;
+  --corner-radius-12: 12px;
   --corner-radius-7: 7px;
+  --corner-radius-4: 4px;
 }
 
 html {
   box-sizing: border-box;
   font-size: 100%;
-  background: linear-gradient(
-    var(--light-purple) 0%,
-    var(--purple) 50%,
-    var(--deep-purple) 100%
-  );
+  background: var(--bluish-grey-background);
 }
 
 *::before,
@@ -80,7 +86,7 @@ body {
   align-items: center;
   justify-content: center;
   background-color: var(--light-grey-background);
-  outline: #c3117e 4px solid;
+  /* outline: #c3117e 4px solid; */
 }
 
 @media (max-width: 600px) {
@@ -105,14 +111,13 @@ a:active {
 }
 
 button {
-  margin: 0;
+  margin: 3px;
   font: inherit;
   border: none;
-  border-radius: var(--corner-radius-12);
+  border-radius: var(--corner-radius-4);
   width: fit-content;
   padding: 0px calc(var(--current-font-size) * 1.25);
   cursor: pointer;
-  /* background-color: #399540; */
 }
 button:hover {
   color: red;
