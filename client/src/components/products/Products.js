@@ -774,7 +774,7 @@ function Products() {
                 ) : (
                   //  -------------------------------------
                   <tr key={product._id}>
-                    <td>
+                    <td id="first-td">
                       <div id="check-box-group">
                         <input
                           type="checkbox"
@@ -812,12 +812,17 @@ function Products() {
                     </td>
                     <td>{product.kg}</td>
                     <td>{product.price}</td>
-                    <td>
+                    <td id="last-td">
                       <div id="edit-delete-buttons-group">
                         <button onClick={() => enableEdit(product._id)}>
                           Edit
                         </button>
-                        <button onClick={() => Delete(product._id)}>X</button>
+                        <button
+                          id="delete-button"
+                          onClick={() => Delete(product._id)}
+                        >
+                          X
+                        </button>
                       </div>
                     </td>
                   </tr>
