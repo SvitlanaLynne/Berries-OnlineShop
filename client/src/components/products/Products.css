@@ -1,6 +1,9 @@
 #main-container {
   width: 100%;
   height: auto;
+  position: absolute;
+  margin-top: 10vh;
+  z-index: 1;
 
   /* outline: 2px solid rgb(223, 149, 0); */
 }

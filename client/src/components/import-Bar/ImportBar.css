@@ -1,8 +1,6 @@
 #import-bar-container {
   display: flex;
+  margin-bottom: clamp(1.25rem, 1.56rem, 2rem);
 
   /* outline: 2px solid grey; */
-}
-#import-buttons-group {
-  /* outline: 5px solid pink; */
 }
