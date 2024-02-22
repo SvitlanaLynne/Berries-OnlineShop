@@ -18,10 +18,12 @@
   --deep-red: #ff343d;
   --red: #fe575f;
   --light-red: #ff8c99;
+  --deep-orange: #e6450e;
+  --orange: #f76313;
   --dark-brown: #2e1815;
   --bright-brown: #540904;
   --brown: #5f2511;
-  --grey: #c0c4c6;
+  --grey: #7e7e7e;
   --graphite: #37474f;
   --contrast-grey: #263238;
   /* grey background */
@@ -43,7 +45,7 @@
   --font-16: 1rem;
   --font-18: 1.125rem;
   --font-88: 5.5rem;
-  --current-font-size: clamp(0.75rem, 0.7rem + 0.25vw, 1rem);
+  --current-font-size: clamp(0.6875rem, 0.655rem + 0.1875vw, 0.875rem);
   /* --line-height: 5rem; */
   --line-height: clamp(1.25rem, 1.56rem, 2rem);
 
@@ -120,6 +122,9 @@ button {
   cursor: pointer;
 }
 button:hover {
-  color: red;
-  transition: color 850ms ease-in-out;
+  color: whitesmoke;
+  font-weight: bold;
+  background-color: var(--light-green);
+  transition: color 550ms ease-in-out;
+  transition: background-color 550ms ease-out;
 }

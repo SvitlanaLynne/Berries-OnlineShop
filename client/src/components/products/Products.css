@@ -1,5 +1,5 @@
 #main-container {
-  width: 100%;
+  width: calc(100% - var(--current-font-size) * 2);
   height: auto;
   position: absolute;
   margin-top: 10vh;
@@ -50,7 +50,7 @@ thead tr:hover {
 
 th {
   font-weight: bold;
-  font-size: calc(var(--current-font-size) * 0.8);
+  font-size: calc(var(--current-font-size) * 0.9);
   color: var(--graphite);
 }
 
@@ -159,6 +159,9 @@ td img {
 
 /* --------- ACTION --------- */
 #action-button {
+  font-size: var(--current-font-size);
+  /* font-weight: inherit; */
+  font-weight: normal;
   background-color: cornflowerblue;
 }
 
@@ -168,19 +171,48 @@ td img {
   align-items: center;
 }
 
-#action-button-group select {
-  background-color: aqua;
+select {
+  border-width: 1px;
+  border-style: solid;
+  border-image: linear-gradient(
+      var(--lightlight-grey-background),
+      var(--dark-green)
+    )
+    1;
+  border-radius: var(--corner-radius-12);
+  background-color: transparent;
+  margin: 1% 0;
+}
+
+select:focus {
+  outline: none;
 }
 option {
   font-family: "Roboto", "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
     "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   font-size: var(--current-font-size);
-  background: #1b1a1a !important;
-  color: #357b1d !important;
+  background-color: var(--lightlight-grey-background);
 }
 
-#filters {
-  /* outline: 2px solid green; */
+/* OTHER ELEMENTS */
+
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: var(--current-font-size);
+  aspect-ratio: 1/1;
+  border: 1px solid var(--dark-green);
+  opacity: 0.5;
+  border-radius: 2px;
+  margin: auto;
+  display: block;
+}
+
+input[type="checkbox"]:checked {
+  opacity: 1;
+  background-color: var(--dark-green);
+  border: none;
 }
 
 #delete-button {
