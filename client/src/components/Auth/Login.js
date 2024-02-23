@@ -89,7 +89,7 @@ function Login() {
         &#8592; Back
       </Link>
       <form className="form-login">
-        <span>Login</span>
+        <span>Login please</span>
         <input
           className="form-input"
           placeholder="youremail@email.com"
@@ -102,7 +102,7 @@ function Login() {
           placeholder="password"
           ref={pwdRef}
         ></input>
-        <button className="loginBtn" onClick={onAttemptLogin}>
+        <button id="login-button" onClick={onAttemptLogin}>
           Login
         </button>
       </form>

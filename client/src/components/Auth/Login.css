@@ -5,6 +5,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  font-size: var(--enlarged-font);
   /* outline: 1px solid red; */
 }
 .back-link {
@@ -25,9 +26,24 @@
   /* outline: 1px solid rgb(173, 212, 224); */
 }
 
-.form-input {
+input {
   width: 100%;
-  height: 2rem;
+  height: calc(var(--enlarged-font) + 1.4rem);
+  padding: 0 10px;
+  font: inherit;
+  border: 1px solid var(--bluish-grey-background);
+  background-color: var(--lightlight-grey-background);
+  font-size: var(--enlarged-font);
+}
+
+input:focus {
+  outline: 2px solid var(--light-green);
+}
+
+input::placeholder {
+  padding: 0 6px;
+  font: inherit;
+  font-size: var(--font-14);
 }
 
 #back-forgot-password-group {
@@ -35,4 +51,9 @@
   max-width: 300px;
   display: flex;
   justify-content: space-between;
+}
+
+#login-button {
+  width: 100%;
+  padding: 6px 0;
 }

@@ -105,6 +105,15 @@ td img {
 #edit-delete-buttons-group button {
   margin: 0% 3%;
 }
+
+#edit-button:hover {
+  background-color: inherit;
+  color: var(--green);
+}
+#delete-button:hover {
+  background-color: inherit;
+  color: var(--deep-red);
+}
 /* ------------------------------------- */
 
 /* --------- ADD FORM --------- */
@@ -160,9 +169,12 @@ td img {
 /* --------- ACTION --------- */
 #action-button {
   font-size: var(--current-font-size);
-  /* font-weight: inherit; */
   font-weight: normal;
-  background-color: cornflowerblue;
+}
+#action-button:hover {
+  font-weight: bold;
+  background-color: var(--light-purple);
+  color: var(deep-purple);
 }
 
 #action-button-group {

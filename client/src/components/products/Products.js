@@ -646,7 +646,7 @@ function Products() {
                       <select onChange={handleActionChange}>
                         <option></option>
                         <option>Bulk Edit</option>
-                        <option>Delete</option>
+                        <option>Bulk Delete</option>
                         <option>Delete All</option>
                       </select>
                     ) : (
@@ -814,7 +814,10 @@ function Products() {
                     <td>{product.price}</td>
                     <td id="last-td">
                       <div id="edit-delete-buttons-group">
-                        <button onClick={() => enableEdit(product._id)}>
+                        <button
+                          id="edit-button"
+                          onClick={() => enableEdit(product._id)}
+                        >
                           Edit
                         </button>
                         <button

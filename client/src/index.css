@@ -14,7 +14,7 @@
   --deep-green: #25440b;
   --dark-green: #427847;
   --green: #399540;
-  --light-green: #5eb566;
+  --light-green: #c3dd96;
   --deep-red: #ff343d;
   --red: #fe575f;
   --light-red: #ff8c99;
@@ -46,6 +46,7 @@
   --font-18: 1.125rem;
   --font-88: 5.5rem;
   --current-font-size: clamp(0.6875rem, 0.655rem + 0.1875vw, 0.875rem);
+  --enlarged-font: calc(var(--current-font-size) * 1.25);
   /* --line-height: 5rem; */
   --line-height: clamp(1.25rem, 1.56rem, 2rem);
 
@@ -106,7 +107,8 @@ a {
   cursor: pointer;
 }
 a:hover {
-  color: var(--green);
+  color: var(--light-purple);
+  transition: color 250ms ease-in-out;
 }
 a:active {
   color: var(--purple);
@@ -114,15 +116,15 @@ a:active {
 
 button {
   margin: 3px;
+  width: fit-content;
   font: inherit;
   border: none;
   border-radius: var(--corner-radius-4);
-  width: fit-content;
   padding: 0px calc(var(--current-font-size) * 1.25);
   cursor: pointer;
 }
 button:hover {
-  color: whitesmoke;
+  color: var(--deep-greengreen);
   font-weight: bold;
   background-color: var(--light-green);
   transition: color 550ms ease-in-out;
