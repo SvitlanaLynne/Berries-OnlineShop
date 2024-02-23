@@ -36,7 +36,7 @@ function ResetPassword() {
       </Link>
       <form id="form-forgot-password">
         <input
-          className="form-input"
+          className="form-login-input"
           placeholder="Enter your email"
           onChange={handleEmailInput}
           disabled={linkSent} // Disable input if the link has been sent

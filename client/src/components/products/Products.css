@@ -127,14 +127,18 @@ td img {
   background-color: transparent;
   /* outline: 4px solid lightsalmon; */
 }
+.add-product-form:hover {
+  background-color: transparent;
+}
 
 .add-product-form input {
   margin: 0;
   padding: 0;
-  width: 100%;
+  width: calc(100% - 6px);
   height: 50%;
   border: none;
   font: inherit;
+  font-size: inherit;
   color: inherit;
   border-radius: var(--corner-radius-7);
   text-align: center;
@@ -142,9 +146,11 @@ td img {
   /* outline: 4px solid lightsalmon; */
 }
 
-.add-product-form:hover {
-  background-color: transparent;
-  /* background-color: red; */
+.add-product-form input:focus,
+.add-product-form input:active,
+.add-product-form input:hover {
+  font-size: inherit;
+  outline: 3px solid var(--light-green);
 }
 
 .file-choose input[type="file"] {
@@ -172,10 +178,13 @@ td img {
   align-items: flex-start;
   height: calc(var(--current-font-size) * 4);
 
-  border-width: 1px;
+  /* border-width: 1px;
   border-style: solid;
-  border-image: linear-gradient(transparent, var(--dark-green)) 1;
-  /* background-color: aquamarine; */
+  border-image: linear-gradient(transparent, var(--dark-green)) 1; */
+  background: linear-gradient(
+    transparent 0%,
+    var(--lightlight-grey-background) 100%
+  );
 }
 
 #import-options-group button {
@@ -193,10 +202,14 @@ td img {
   font-size: var(--current-font-size);
   font-weight: normal;
 }
-#action-button:hover {
+#action-button:hover,
+#action-button:focus {
   font-weight: bold;
   background-color: var(--light-purple);
-  color: var(deep-purple);
+  color: var(--deep-purple);
+}
+#action-button:active {
+  transform: scale(0.97);
 }
 
 #action-button-group {

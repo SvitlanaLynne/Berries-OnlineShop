@@ -15,6 +15,7 @@
   --deep-green: #25440b;
   --dark-green: #427847;
   --green: #399540;
+  --yellowish-green: #c5cc95;
   --light-green: #c3dd96;
   --deep-red: #ff343d;
   --red: #fe575f;
@@ -38,7 +39,7 @@
     0deg,
     rgba(39, 57, 9, 1) 0%,
     rgba(49, 108, 16, 1) 22%,
-    rgba(197, 204, 149, 1) 100%
+    #c5cc95 100%
   );
 
   /* fonts */

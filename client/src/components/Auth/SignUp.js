@@ -49,13 +49,13 @@ function SignUp() {
       <form className="form-login">
         <span>Sign Up please</span>
         <input
-          className="form-input"
+          className="form-login-input"
           placeholder="youremail@email.com"
           type="text"
           ref={userRef}
         ></input>
         <input
-          className="form-input"
+          className="form-login-input"
           type="text"
           placeholder="password"
           ref={pwdRef}

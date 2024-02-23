@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import ImportBar from "../import-Bar";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faImage, faFileExcel } from "@fortawesome/free-solid-svg-icons";
 import Url from "../../config";
 
 function Products() {
@@ -76,8 +78,8 @@ function Products() {
   useEffect(() => {
     const hideForm = (e) => {
       const isAddProductButton =
-        e.target === document.querySelector("#add-product-button") ||
-        document.querySelector("#add-product-button").contains(e.target);
+        e.target === document.querySelector(".add-product-button") ||
+        document.querySelector(".add-product-button").contains(e.target);
 
       if (formShown && !e.target.closest("table") && !isAddProductButton) {
         setFormShown(false);
@@ -542,7 +544,7 @@ function Products() {
     const selectedAction = e.target.value;
 
     switch (selectedAction) {
-      case "Delete":
+      case "Bulk Delete":
         DeleteBulk();
         break;
       case "Delete All":
@@ -603,11 +605,27 @@ function Products() {
       <ImportBar addForm={addForm} addImportOptions={addImportOptions} />
       {importShown === true ? (
         <div id="import-options-group">
-          <button onClick={() => openUploadWindow()}>
+          <button
+            className="add-product-button"
+            onClick={() => openUploadWindow()}
+          >
             Import Products from File
+            <FontAwesomeIcon
+              className="custom-icon"
+              id="icon-folder"
+              icon={faFileExcel}
+            />
           </button>
-          <button onClick={() => openUploadImagesWindow()}>
+          <button
+            className="add-product-button"
+            onClick={() => openUploadImagesWindow()}
+          >
             Bulk Add Images
+            <FontAwesomeIcon
+              className="custom-icon"
+              id="icon-folder"
+              icon={faImage}
+            />
           </button>
         </div>
       ) : (

@@ -9,9 +9,10 @@
   align-items: center;
 }
 
-#add-product-button {
+.add-product-button {
   display: flex;
   align-items: center;
+
   margin: 3px;
   width: fit-content;
   min-width: min-content;
@@ -19,7 +20,8 @@
 }
 .custom-icon {
   color: #a8bac1;
-  padding: 0 10%;
+  margin-left: 6px;
+  /* padding: 0 10%; */
   transition: color 550ms ease-in-out;
 }
 
