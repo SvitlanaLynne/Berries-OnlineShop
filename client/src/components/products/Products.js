@@ -624,17 +624,19 @@ function Products() {
           <span>Loading...</span>
         ) : (
           <table>
-            <col id="col-checkbox" />
-            <col id="col-image" />
-            <col id="col-name" />
-            <col id="col-in-stock" />
-            <col id="col-kg" />
-            <col id="col-price" />
-            <col id="col-buttons" />
+            <colgroup>
+              <col id="col-checkbox" />
+              <col id="col-image" />
+              <col id="col-name" />
+              <col id="col-in-stock" />
+              <col id="col-kg" />
+              <col id="col-price" />
+              <col id="col-buttons" />
+            </colgroup>
             <thead>
               <tr>
-                <th className="header">
-                  <input type="checkbox" />
+                <th>
+                  <input className="checkbox" type="checkbox" />
                 </th>
                 {/* ------- action menu ------- */}
                 <th>
@@ -666,10 +668,10 @@ function Products() {
             <tbody>
               {/* ---------- add product form ---------- */}
               {formShown === true ? (
-                <tr id="add-product-form">
-                  <td></td>
+                <tr className="add-product-form">
+                  <td className="first-td"></td>
                   <td>
-                    <div id="file-choose">
+                    <div className="file-choose">
                       <input
                         type="file"
                         multiple
@@ -708,7 +710,7 @@ function Products() {
                       required
                     />
                   </td>
-                  <td>
+                  <td className="last-td">
                     <div id="submit-cancel-buttons-group">
                       <button onClick={() => handleProductUpload()}>
                         Submit
@@ -726,15 +728,17 @@ function Products() {
               {/* ---------- products ---------- */}
               {data.map((product) => {
                 return isEditing === product._id ? (
-                  <tr key={product._id} id="form">
+                  <tr className="add-product-form" key={product._id} id="form">
                     {/* ---------- edit form ---------- */}
-                    <td></td>
+                    <td className="first-td"></td>
                     <td>
-                      <input
-                        type="file"
-                        multiple
-                        onChange={handleImagesSelection}
-                      ></input>
+                      <div className="file-choose">
+                        <input
+                          type="file"
+                          multiple
+                          onChange={handleImagesSelection}
+                        ></input>
+                      </div>
                     </td>
                     <td>
                       <input
@@ -764,7 +768,7 @@ function Products() {
                         required
                       />
                     </td>
-                    <td>
+                    <td className="last-td">
                       <button onClick={() => productEdit(product._id)}>
                         Submit
                       </button>
@@ -774,9 +778,10 @@ function Products() {
                 ) : (
                   //  -------------------------------------
                   <tr key={product._id}>
-                    <td id="first-td">
+                    <td className="first-td">
                       <div id="check-box-group">
                         <input
+                          className="checkbox"
                           type="checkbox"
                           checked={checkedItems.includes(product._id)}
                           onChange={() => handleCheckedChange(product._id)}
@@ -812,7 +817,7 @@ function Products() {
                     </td>
                     <td>{product.kg}</td>
                     <td>{product.price}</td>
-                    <td id="last-td">
+                    <td className="last-td">
                       <div id="edit-delete-buttons-group">
                         <button
                           id="edit-button"
@@ -844,15 +849,17 @@ function Products() {
         {/* // ----------a window appears "Import from File" ------------- */}
         <div id="fileUploadWindow" className="modalWindow">
           <span className="closeX" onClick={() => closeUploadWindow()}>
-            &times;
+            X
           </span>
           <form className="modal-window-content-container">
             <span>Bulk Import from File</span>
-            <input
-              type="file"
-              accept=".csv"
-              onChange={handleCSVSelection}
-            ></input>
+            <div className="file-choose">
+              <input
+                type="file"
+                accept=".csv"
+                onChange={handleCSVSelection}
+              ></input>
+            </div>
             <button
               className="modal-window-buttons-group"
               onClick={() => importProductsFromFile()}
@@ -864,15 +871,17 @@ function Products() {
         {/* ------------- a window appears "Import Bulk Images" ------------- */}
         <div id="imagesUploadWindow" className="modalWindow">
           <span className="closeX" onClick={() => closeImagesUploadWindow()}>
-            &times;
+            X
           </span>
           <form className="modal-window-content-container">
             <span>Import Bulk Images</span>
-            <input
-              type="file"
-              multiple
-              onChange={handleImagesSelection}
-            ></input>
+            <div className="file-choose">
+              <input
+                type="file"
+                multiple
+                onChange={handleImagesSelection}
+              ></input>
+            </div>
             <button
               className="modal-window-buttons-group"
               onClick={() => importBulkImages()}
@@ -884,7 +893,7 @@ function Products() {
         {/* ------------- a window appears "Delete one confirmation" ------------- */}
         <div id="deleteProductWindow" className="modalWindow">
           <span className="closeX" id="closeModal">
-            &times;
+            X
           </span>
           <div className="modal-window-content-container">
             <span>Are you sure you'd like to delete this item?</span>
@@ -897,7 +906,7 @@ function Products() {
         {/* ------------- a window appears "Delete Bulk confirmation" ------------- */}
         <div id="bulkDeleteWindow" className="modalWindow">
           <span className="closeX" id="bulkDelCloseModal">
-            &times;
+            X
           </span>
           <div className="modal-window-content-container">
             <span>
@@ -912,7 +921,7 @@ function Products() {
         {/* ------------- a window appears "Edit Bulk" ------------- */}
         <div id="bulkEditWindow" className="modalWindow">
           <span className="closeX" onClick={() => closeBulkEditWindow()}>
-            &times;
+            X
           </span>
           <span>Bulk Edit</span>
           <form className="modal-window-content-container">

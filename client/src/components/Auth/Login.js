@@ -102,7 +102,7 @@ function Login() {
           placeholder="password"
           ref={pwdRef}
         ></input>
-        <button id="login-button" onClick={onAttemptLogin}>
+        <button className="large-log-button" onClick={onAttemptLogin}>
           Login
         </button>
       </form>

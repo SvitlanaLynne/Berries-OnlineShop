@@ -41,7 +41,11 @@ function ResetPassword() {
           onChange={handleEmailInput}
           disabled={linkSent} // Disable input if the link has been sent
         ></input>
-        <button id="restore-pwd-button" onClick={sendEmail} disabled={linkSent}>
+        <button
+          className="large-log-button"
+          onClick={sendEmail}
+          disabled={linkSent}
+        >
           Restore password
         </button>
       </form>

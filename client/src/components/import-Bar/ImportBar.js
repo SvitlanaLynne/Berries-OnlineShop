@@ -4,7 +4,7 @@ function ImportBar({ addForm, addImportOptions }) {
       <button onClick={addForm} id="add-product-button">
         Add Product
       </button>
-      <button onClick={addImportOptions} id="import-button">
+      <button id="import-button" onClick={addImportOptions}>
         Import
       </button>
     </section>

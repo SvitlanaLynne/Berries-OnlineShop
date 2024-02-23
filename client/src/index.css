@@ -8,9 +8,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:ital,wght@0,300;1,300&display=swap");
 
 :root {
+  --almost-white: #eff0f5;
   --deep-purple: #695ea0;
   --purple: #9085c1;
-  --light-purple: #beb6dd;
+  --light-purple: rgb(190, 182, 221);
   --deep-green: #25440b;
   --dark-green: #427847;
   --green: #399540;
@@ -120,6 +121,7 @@ button {
   font: inherit;
   border: none;
   border-radius: var(--corner-radius-4);
+  background-color: var(--almost-white);
   padding: 0px calc(var(--current-font-size) * 1.25);
   cursor: pointer;
 }

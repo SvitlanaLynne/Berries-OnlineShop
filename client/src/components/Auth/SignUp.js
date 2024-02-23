@@ -47,7 +47,7 @@ function SignUp() {
         &#8592; Back
       </Link>
       <form className="form-login">
-        <span>Sign Up</span>
+        <span>Sign Up please</span>
         <input
           className="form-input"
           placeholder="youremail@email.com"
@@ -60,7 +60,7 @@ function SignUp() {
           placeholder="password"
           ref={pwdRef}
         ></input>
-        <button className="loginBtn" onClick={onAttemptSignUp}>
+        <button className="large-log-button" onClick={onAttemptSignUp}>
           Sign Up
         </button>
       </form>
