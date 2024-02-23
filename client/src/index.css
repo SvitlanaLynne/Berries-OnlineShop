@@ -118,6 +118,7 @@ a:active {
 button {
   margin: 3px;
   width: fit-content;
+  min-width: min-content;
   font: inherit;
   border: none;
   border-radius: var(--corner-radius-4);

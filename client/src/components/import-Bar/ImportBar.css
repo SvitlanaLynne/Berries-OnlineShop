@@ -4,3 +4,29 @@
 
   /* outline: 2px solid grey; */
 }
+#import-button {
+  display: flex;
+  align-items: center;
+}
+
+#add-product-button {
+  display: flex;
+  align-items: center;
+  margin: 3px;
+  width: fit-content;
+  min-width: min-content;
+  white-space: nowrap;
+}
+.custom-icon {
+  color: #a8bac1;
+  padding: 0 10%;
+  transition: color 550ms ease-in-out;
+}
+
+button:hover .custom-icon {
+  color: var(--dark-green);
+}
+
+#icon-plus {
+  font-size: calc(var(--current-font-size) * 1.1);
+}

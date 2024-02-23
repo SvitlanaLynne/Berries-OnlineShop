@@ -124,7 +124,7 @@ td img {
 .add-product-form {
   width: 100%;
   height: calc(var(--current-font-size) * 4);
-  background-color: var(--lightlight-grey-background);
+  background-color: transparent;
   /* outline: 4px solid lightsalmon; */
 }
 
@@ -138,12 +138,12 @@ td img {
   color: inherit;
   border-radius: var(--corner-radius-7);
   text-align: center;
-  background-color: var(--lightlight-grey-background);
+  background-color: transparent;
   /* outline: 4px solid lightsalmon; */
 }
 
 .add-product-form:hover {
-  background-color: var(--lightlight-grey-background);
+  background-color: transparent;
   /* background-color: red; */
 }
 
