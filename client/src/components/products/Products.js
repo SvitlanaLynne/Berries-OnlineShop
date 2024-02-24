@@ -1,7 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import ImportBar from "../import-Bar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faImage, faFileExcel } from "@fortawesome/free-solid-svg-icons";
+import {
+  faImage,
+  faFileExcel,
+  faChevronDown,
+} from "@fortawesome/free-solid-svg-icons";
 import Url from "../../config";
 
 function Products() {
@@ -547,9 +551,9 @@ function Products() {
       case "Bulk Delete":
         DeleteBulk();
         break;
-      case "Delete All":
-        DeleteAll();
-        break;
+      // case "Delete All":
+      //   DeleteAll();
+      //   break;
       case "Bulk Edit":
         openBulkEditWindow();
         break;
@@ -633,6 +637,8 @@ function Products() {
       )}
 
       <main id="products-container">
+        <div class="sunshine"></div>
+        <div class="particles"></div>
         {/* ---------- filters ---------- */}
         {/* <aside id="filters">Filter Block</aside> */}
 
@@ -667,7 +673,7 @@ function Products() {
                         <option></option>
                         <option>Bulk Edit</option>
                         <option>Bulk Delete</option>
-                        <option>Delete All</option>
+                        <option disabled>Delete All</option>
                       </select>
                     ) : (
                       ""
@@ -678,7 +684,10 @@ function Products() {
                 <th>Name</th>
                 <th>In Stock</th>
                 <th>Kg</th>
-                <th>Price</th>
+                <th>
+                  <span>Price </span>
+                  <span id="currency">(CAD/kg)</span>
+                </th>
                 <th></th>
               </tr>
             </thead>
@@ -745,9 +754,11 @@ function Products() {
 
               {/* ---------- products ---------- */}
               {data.map((product) => {
+                {
+                  /* ---------- edit form ---------- */
+                }
                 return isEditing === product._id ? (
                   <tr className="add-product-form" key={product._id} id="form">
-                    {/* ---------- edit form ---------- */}
                     <td className="first-td"></td>
                     <td>
                       <div className="file-choose">
@@ -812,6 +823,10 @@ function Products() {
                           imgUrl.includes(`${product.name + ".jpg"}`) ||
                           imgUrl.includes(
                             `${product.name.toLowerCase() + ".jpg"}`
+                          ) ||
+                          imgUrl.includes(`${product.name + ".png"}`) ||
+                          imgUrl.includes(
+                            `${product.name.toLowerCase() + ".png"}`
                           )
                         ) {
                           return (

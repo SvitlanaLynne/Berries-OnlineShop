@@ -25,7 +25,7 @@
   --dark-brown: #2e1815;
   --bright-brown: #540904;
   --brown: #5f2511;
-  --grey: #7e7e7e;
+  --grey: #a1a1a1;
   --graphite: #37474f;
   --contrast-grey: #263238;
   /* grey background */
@@ -77,6 +77,8 @@ body {
   /* font-family: "Pacifico", cursive; */
   font-family: "Roboto", "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
     "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+
+  overflow: hidden;
 
   color: var(--graphite);
 }

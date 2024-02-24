@@ -9,7 +9,12 @@ function Home() {
         <Link id="logout" to="/">
           Logout
         </Link>
-        <img id="small-logo" src={LogoImg} alt="Berries Project Logo" />
+        <div class="logo">
+          <img id="small-logo" src={LogoImg} alt="Berries Project Logo" />
+          <div class="leaf"></div>
+          <div class="leaf"></div>
+          <div class="leaf"></div>
+        </div>
       </nav>
       <Products />
     </div>

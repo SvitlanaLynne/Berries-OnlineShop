@@ -405,13 +405,21 @@ router.delete(`/product/:productId`, async (req, res) => {
       });
 
       const checkImageExistance = async (imageName) => {
-        const imageRef = ref(storage, `images/${imageName}.jpg`);
+        const imageRefJPG = ref(storage, `images/${imageName}.jpg`);
+        const imageRefPNG = ref(storage, `images/${imageName}.png`);
 
         try {
-          const url = await getDownloadURL(imageRef);
+          // for JPG
+          const urlJPG = await getDownloadURL(imageRefJPG);
           return true;
-        } catch (error) {
-          return false;
+        } catch (errorJPG) {
+          try {
+            // for PNG
+            const urlPNG = await getDownloadURL(imageRefPNG);
+            return true;
+          } catch (errorPNG) {
+            return false;
+          }
         }
       };
 
