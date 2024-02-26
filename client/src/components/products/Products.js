@@ -1,11 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import ImportBar from "../import-Bar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faImage,
-  faFileExcel,
-  faChevronDown,
-} from "@fortawesome/free-solid-svg-icons";
+import { faImage, faFileExcel } from "@fortawesome/free-solid-svg-icons";
 import Url from "../../config";
 
 function Products() {
@@ -15,10 +11,11 @@ function Products() {
     price: "",
   };
   const [data, setData] = useState([]);
+  const [allProductIds, setAllProductIds] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [pageLoading, setPageLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(2);
+  const [pageSize, setPageSize] = useState(5);
   const [totalProducts, setTotalProducts] = useState(0);
   const [productsLoaded, setProductsLoaded] = useState(0);
   const [formShown, setFormShown] = useState(false);
@@ -54,6 +51,9 @@ function Products() {
       }
 
       const { data, total } = await response.json();
+
+      const productIds = data.map((product) => product._id);
+      setAllProductIds((prevIds) => [...prevIds, ...productIds]);
       setTotalProducts(total);
       setProductsLoaded((prev) => prev + data.length);
       setData((prevData) => [...prevData, ...data]);
@@ -66,17 +66,21 @@ function Products() {
   }, [
     page,
     pageSize,
+
     setTotalProducts,
     setProductsLoaded,
     setData,
     setIsLoading,
     setPageLoading,
+    setAllProductIds,
   ]);
 
   useEffect(() => {
     fetchData();
     console.log("fetchData triggered");
   }, [fetchData, page, pageSize]);
+
+  console.log("PRODUCTS IDS", allProductIds);
 
   // ----- HIDE/SHOW elements -----
   useEffect(() => {
@@ -594,7 +598,11 @@ function Products() {
     setActionDropDownShown((prev) => !prev);
   };
 
-  // function checkedAll() {}
+  const handleSelectAll = () => {
+    setCheckedItems((prevItems) =>
+      prevItems.length === allProductIds.length ? [] : [...allProductIds]
+    );
+  };
 
   const handleLoadMore = () => {
     if (productsLoaded < totalProducts) setPage((prevPage) => prevPage + 1);
@@ -660,7 +668,12 @@ function Products() {
             <thead>
               <tr>
                 <th>
-                  <input className="checkbox" type="checkbox" />
+                  <input
+                    className="checkbox"
+                    type="checkbox"
+                    checked={checkedItems.length === allProductIds.length}
+                    onChange={handleSelectAll}
+                  />
                 </th>
                 {/* ------- action menu ------- */}
                 <th>
@@ -754,11 +767,9 @@ function Products() {
 
               {/* ---------- products ---------- */}
               {data.map((product) => {
-                {
-                  /* ---------- edit form ---------- */
-                }
                 return isEditing === product._id ? (
                   <tr className="add-product-form" key={product._id} id="form">
+                    {/* ---------- edit form ---------- */}
                     <td className="first-td"></td>
                     <td>
                       <div className="file-choose">

@@ -60,7 +60,7 @@ const folderRef = ref(storage, "images"); // points to 'images' folder.
 router.get("/products", async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const pageSize = parseInt(req.query.pageSize) || 2;
+    const pageSize = parseInt(req.query.pageSize) || 5;
 
     const totalProducts = await Berry.countDocuments();
 
