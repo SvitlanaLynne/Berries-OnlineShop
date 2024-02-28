@@ -84,17 +84,18 @@ body {
   color: var(--graphite);
 }
 
+/* .wrapper { */
+
 .wrapper {
+  position: relative;
   width: calc(100vw - 2rem);
   max-width: var(--container);
   height: 100vh;
   margin: auto;
-
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: var(--light-grey-background);
-  /* outline: #c3117e 4px solid; */
 }
 
 @media (max-width: 600px) {

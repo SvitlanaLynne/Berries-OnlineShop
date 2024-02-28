@@ -7,22 +7,23 @@ function Home() {
   const [isAtmosphereOn, setIsAtmosphereOn] = useState(false);
   const [isMessageDisplayed, setIsMessageDisplayed] = useState(false);
 
-  const displayStyle = isMessageDisplayed ? "block" : "none";
-
   useEffect(() => {
     const userMessageON = document.getElementById("ON");
     const userMessageOFF = document.getElementById("OFF");
 
     if (userMessageON && userMessageOFF) {
-      userMessageON.style.display = isAtmosphereOn ? displayStyle : "none";
-      userMessageOFF.style.display = !isAtmosphereOn ? displayStyle : "none";
+      userMessageON.style.opacity =
+        isAtmosphereOn && isMessageDisplayed ? "1" : "0";
+      userMessageOFF.style.opacity =
+        !isAtmosphereOn && isMessageDisplayed ? "1" : "0";
     }
 
-    const timeoutUserMEssage = setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       setIsMessageDisplayed(false);
-    }, 3000);
-    return () => clearTimeout(timeoutUserMEssage); // Cleanup the timeout to avoid memory leaks
-  }, [isAtmosphereOn, isMessageDisplayed, displayStyle]);
+    }, 2000);
+
+    return () => clearTimeout(timeoutId);
+  }, [isAtmosphereOn, isMessageDisplayed]);
 
   const toggleAtmosphere = () => {
     setIsAtmosphereOn((prevState) => !prevState);
@@ -34,14 +35,20 @@ function Home() {
       <div
         className="user-message-pop-up"
         id="ON"
-        style={{ display: displayStyle }}
+        style={{
+          opacity: isMessageDisplayed && isAtmosphereOn ? "1" : "0",
+          transition: "opacity 0.75s ease-in-out",
+        }}
       >
         Atmosphere effect is ON
       </div>
       <div
         className="user-message-pop-up"
         id="OFF"
-        style={{ display: displayStyle }}
+        style={{
+          opacity: isMessageDisplayed && !isAtmosphereOn ? "1" : "0",
+          transition: "opacity 0.75s ease-in-out",
+        }}
       >
         Atmosphere effect is OFF
       </div>
@@ -51,7 +58,7 @@ function Home() {
         </Link>
         <div class="logo">
           <img
-            id="small-logo"
+            // id="small-logo"
             src={LogoImg}
             onClick={toggleAtmosphere}
             alt="Berries Project Logo"

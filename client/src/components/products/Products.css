@@ -3,7 +3,7 @@
   height: auto;
   position: absolute;
   margin-top: 10vh;
-  z-index: 1;
+  z-index: 2;
 
   /* outline: 2px solid rgb(223, 149, 0); */
 }
