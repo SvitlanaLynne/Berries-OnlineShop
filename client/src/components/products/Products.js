@@ -645,8 +645,10 @@ function Products() {
       )}
 
       <main id="products-container">
-        <div class="sunshine"></div>
-        <div class="particles"></div>
+        {/* ---------- atmosphere ---------- */}
+        {/* <div class="sunshine"></div>
+        <div class="particles"></div> */}
+
         {/* ---------- filters ---------- */}
         {/* <aside id="filters">Filter Block</aside> */}
 

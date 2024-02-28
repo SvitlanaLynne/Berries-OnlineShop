@@ -14,9 +14,9 @@
   --light-purple: rgb(190, 182, 221);
   --deep-green: #25440b;
   --dark-green: #427847;
-  --green: #399540;
+  --green: rgb(57, 149, 64);
   --yellowish-green: #c5cc95;
-  --light-green: #c3dd96;
+  --light-green: rgb(195, 221, 150);
   --deep-red: #ff343d;
   --red: #fe575f;
   --light-red: #ff8c99;
@@ -26,6 +26,7 @@
   --bright-brown: #540904;
   --brown: #5f2511;
   --grey: #a1a1a1;
+  --mid-grey: #656b6f;
   --graphite: #37474f;
   --contrast-grey: #263238;
   /* grey background */
