@@ -8,23 +8,35 @@
   justify-content: space-between;
   position: relative;
 
-  /* outline: 2px solid rgb(33, 195, 198); */
+  outline: 2px solid rgb(33, 195, 198);
 }
 
-#home-container::before {
+#home-container::before,
+#home-container::after {
   content: "";
   position: absolute;
   top: 0;
-  left: 0;
-  width: 100%;
+  width: 50%;
   height: 100%;
-  background-image: url("../../../assets/Malinka.png");
+  opacity: 0.05;
+  z-index: 2;
+}
+
+/* #home-container::before {
+  left: 0;
+  background-image: url("../../../assets/mj1.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: left;
+} */
+
+/* #home-container::after {
+  right: 0;
+  background-image: url("../../../assets/Blueberry.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: right;
-  opacity: 0.04;
-  z-index: 0;
-}
+} */
 
 .user-message-pop-up {
   position: absolute;
