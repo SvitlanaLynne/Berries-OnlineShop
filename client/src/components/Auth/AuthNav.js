@@ -1,6 +1,7 @@
 import { useAuth } from "./AuthProvider";
 import { Link } from "react-router-dom";
-import berriesImg from "../../assets/Logo-Berries.png";
+import berriesImg from "../../assets/Main_Logo_Berries.png";
+import berriesTxt from "../../assets/Main_Logo_Text.png";
 
 function AuthNav() {
   const authContext = useAuth();
@@ -8,15 +9,17 @@ function AuthNav() {
   return (
     <div id="landing-page-container">
       <div id="canvas">
-        <img className="layer" id="berries-bg" src={berriesImg} alt="Logo" />
         <img
           className="layer"
-          id="company-name"
-          // src={berriesImg}
+          id="logo-text"
+          src={berriesTxt}
           alt="Company name"
         />
+        <img className="layer" id="logo-berries" src={berriesImg} alt="Logo" />
+        <div className="layer" id="flare"></div>
+        <div className="layer" id="flare1"></div>
       </div>
-      <nav>
+      <nav id="login-links">
         {authContext.currentUser ? (
           <Link to="/logout">Logout</Link>
         ) : (

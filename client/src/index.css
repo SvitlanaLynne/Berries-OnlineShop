@@ -95,7 +95,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--light-grey-background);
+  background: linear-gradient(
+    180deg,
+    white 0%,
+    var(--lightlight-grey-background) 12%,
+    var(--light-grey-background) 30%,
+    var(--light-grey-background) 100%
+  );
+  /* background-color: var(--light-grey-background); */
 }
 
 @media (max-width: 600px) {

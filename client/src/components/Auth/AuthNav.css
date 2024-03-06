@@ -10,21 +10,134 @@
 }
 
 #canvas {
-  width: calc(100% - 2rem);
+  position: relative;
   height: auto;
+  width: 75vw;
+  min-width: 0;
   max-width: 500px;
   max-height: 500px;
   aspect-ratio: 1 / 1;
-  margin-bottom: 1%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  outline: 1px solid rgb(163, 163, 163);
+  margin-bottom: 1rem;
+  overflow: visible;
+  /* outline: 1px solid rgb(163, 163, 163); */
 }
 
 .layer {
+  position: absolute;
   width: 100%;
   height: auto;
+
+  animation-delay: 0.5s;
+  animation: opacity linear;
+  animation-duration: 2s;
+  animation-fill-mode: both;
+  transition-timing-function: ease-in-out;
+}
+
+#logo-berries {
+  z-index: 0;
+  animation-name: anim-berries;
+}
+
+#logo-text {
+  z-index: 1;
+  animation-delay: 0.75s;
+  animation-duration: 1s;
+  animation-name: anim-text;
+}
+
+#login-links {
+  animation-name: anim-login;
+  animation-delay: 2s;
+  animation-duration: 2s;
+  animation-fill-mode: both;
+  transition-timing-function: ease-in-out;
+}
+#flare {
+  z-index: 3;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: transparent;
+  animation-name: anim-flare;
+}
+#flare1 {
+  z-index: 4;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: white;
+  /* animation-name: anim-flare; */
+}
+
+@keyframes anim-flare {
+  0% {
+    opacity: 0;
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 1) 0%,
+      transparent 80%
+    );
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 1) 10%,
+      rgba(250, 239, 154, 0.9) 30%,
+      transparent 90%
+    );
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 0.2;
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 1) 10%,
+      rgba(250, 239, 154, 0.9) 30%,
+      transparent 90%
+    );
+
+    transform: scale(1);
+  }
+}
+
+@keyframes anim-berries {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes anim-text {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
+@keyframes anim-login {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

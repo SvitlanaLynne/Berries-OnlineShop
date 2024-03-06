@@ -58,7 +58,6 @@ function Home() {
         </Link>
         <div class="logo">
           <img
-            // id="small-logo"
             src={LogoImg}
             onClick={toggleAtmosphere}
             alt="Berries Project Logo"
