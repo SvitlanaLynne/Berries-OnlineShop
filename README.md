@@ -27,20 +27,20 @@ Authentication was achieved using the Google Firebase SDK.
 
 ## Screenshots starting with the Landing page
 
-![Screenshot](../Berries-OnlineShop/client/public/Landing_page_Berries.jpg)
+![Screenshot](./client/public/Landing_page_Berries.jpg)
 
 ## Login or Sign up
 
-![Screenshot](../Berries-OnlineShop/client/public/login_page_Berries.jpg)
+![Screenshot](./client/public/login_page_Berries.jpg)
 
 ## Main page of the Dashboard
 
-![Screenshot](../Berries-OnlineShop/client/public/main_page_list_Berries.jpg)
+![Screenshot](./client/public/main_page_list_Berries.jpg)
 
 ## Add, Edit or Delete products
 
-![Screenshot](../Berries-OnlineShop/client/public/add_product_Berries.jpg)
-![Screenshot](../Berries-OnlineShop/client/public/action.jpg)
+![Screenshot](./client/public/add_product_Berries.jpg)
+![Screenshot](./client/public/action.jpg)
 
-![Screenshot](../Berries-OnlineShop/client/public/bulk_edit_Berries.jpg)
+![Screenshot](./client/public/bulk_edit_Berries.jpg)
 ![Screenshot](./client/public/import_from_file.jpg)
