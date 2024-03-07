@@ -7,6 +7,8 @@
   justify-content: center;
   font-size: var(--enlarged-font);
   /* outline: 1px solid red; */
+
+  z-index: 2;
 }
 .back-link {
   align-self: flex-start;

@@ -15,7 +15,7 @@ function Products() {
   const [isLoading, setIsLoading] = useState(true);
   const [pageLoading, setPageLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(10);
   const [totalProducts, setTotalProducts] = useState(0);
   const [productsLoaded, setProductsLoaded] = useState(0);
   const [formShown, setFormShown] = useState(false);
@@ -66,7 +66,6 @@ function Products() {
   }, [
     page,
     pageSize,
-
     setTotalProducts,
     setProductsLoaded,
     setData,
@@ -172,12 +171,14 @@ function Products() {
       }
 
       console.log("Form and images submitted successfully");
-      setData([]);
-      await fetchData();
-      setSelectedImages([]);
     } catch (error) {
       console.error("An unexpected error occurred:", error);
       window.alert("An unexpected error occurred. Please try again later.");
+    } finally {
+      setPage((prevPage) => 1);
+      setData((prevData) => []);
+      setSelectedImages([]);
+      await fetchData();
     }
   };
 
@@ -454,7 +455,7 @@ function Products() {
         window.alert("An unexpected error occurred while deleting the item.");
       } finally {
         setPage(1);
-        setData([]);
+        setData((prevData) => []);
         await fetchData();
       }
     }
@@ -969,8 +970,8 @@ function Products() {
           <span className="closeX" onClick={() => closeBulkEditWindow()}>
             X
           </span>
-          <span>Bulk Edit</span>
           <form className="modal-window-content-container">
+            <span>Bulk Edit</span>
             <div id="kg-price-input-group">
               <div>
                 <label>Kg</label>

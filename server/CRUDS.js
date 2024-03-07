@@ -60,7 +60,7 @@ const folderRef = ref(storage, "images"); // points to 'images' folder.
 router.get("/products", async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const pageSize = parseInt(req.query.pageSize) || 5;
+    const pageSize = parseInt(req.query.pageSize) || 10;
 
     const totalProducts = await Berry.countDocuments();
 
@@ -113,7 +113,7 @@ const handleImagesUpload = (req, res, next) => {
 
       // Attach promises to the request object
       req.imageUploadPromises = promises;
-      res.status(200).send("Images uploaded successfully.");
+
       next();
     } catch (error) {
       console.error(
@@ -147,7 +147,7 @@ router.post("/upload/form", handleImagesUpload, async (req, res) => {
       price: req.body.price,
       images: imageURLs,
     });
-    res.status(204);
+    res.status(201).send("\nNew product created\n");
     console.log("ONE NEW PRODUCT CREATED IN DB:", newProduct);
   } catch (error) {
     console.log("Error while inserting a product to DB:", error);

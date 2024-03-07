@@ -6,7 +6,10 @@
   align-items: center;
   justify-content: center;
   font-size: var(--enlarged-font);
-  /* outline: 1px solid rgb(209, 25, 25); */
+  background: var(--white-green);
+  box-shadow: 0 0 30px rgba(18, 8, 45, 0.3);
+
+  outline: 2px solid rgb(255, 255, 255);
 }
 
 #canvas {
@@ -19,7 +22,12 @@
   aspect-ratio: 1 / 1;
   margin-bottom: 1rem;
   overflow: visible;
+
   /* outline: 1px solid rgb(163, 163, 163); */
+}
+
+#login-links {
+  z-index: 2;
 }
 
 .layer {
@@ -35,12 +43,12 @@
 }
 
 #logo-berries {
-  z-index: 0;
+  z-index: 1;
   animation-name: anim-berries;
 }
 
 #logo-text {
-  z-index: 1;
+  z-index: 2;
   animation-delay: 0.75s;
   animation-duration: 1s;
   animation-name: anim-text;
@@ -54,10 +62,13 @@
   transition-timing-function: ease-in-out;
 }
 #flare {
-  z-index: 3;
+  z-index: 0;
+
   position: absolute;
-  width: 110%;
-  height: 110%;
+  top: -65%;
+  left: -50%;
+  width: 190%;
+  height: 190%;
   border-radius: 50%;
   background: transparent;
   animation-delay: 0.25s;
@@ -88,7 +99,7 @@
     transform: scale(1);
   }
   50% {
-    opacity: 1;
+    opacity: 1.1;
     background: radial-gradient(
       circle,
       rgba(255, 255, 255, 1) 0%,
