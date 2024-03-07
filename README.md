@@ -43,4 +43,4 @@ Authentication was achieved using the Google Firebase SDK.
 ![Screenshot](../Berries-OnlineShop/client/public/action.jpg)
 
 ![Screenshot](../Berries-OnlineShop/client/public/bulk_edit_Berries.jpg)
-![Screenshot](../Berries-OnlineShop/client/public/import_from_file.jpg)
+![Screenshot](./client/public/import_from_file.jpg)
