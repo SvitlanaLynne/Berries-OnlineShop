@@ -36,8 +36,6 @@ function SignUp() {
         // Show a generic alert for other errors
         alert("An error occurred during sign-up. Please try again.");
       }
-
-      // Do not redirect in case of an error
     }
   };
 

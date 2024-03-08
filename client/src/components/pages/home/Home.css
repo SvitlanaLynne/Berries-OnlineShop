@@ -41,7 +41,6 @@
 }
 
 .logo {
-  /* position: relative; */
   width: auto;
   height: 100%;
   min-height: 100px;
@@ -63,6 +62,61 @@
 
 .logo img:active {
   transform: scale(0.97);
+}
+
+.atmosphere-sun {
+  animation: opacity transform linear;
+  animation-duration: 5s;
+  animation-fill-mode: both;
+  transition-timing-function: ease-in-out;
+}
+
+#flare3 {
+  z-index: 4;
+  position: absolute;
+  bottom: 2%;
+  left: 10%;
+  width: 5%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: transparent;
+
+  animation-delay: 1.25s;
+  animation-name: anim-flare3;
+}
+
+@keyframes anim-flare3 {
+  0% {
+    opacity: 0;
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 1) 0%,
+      transparent 80%
+    );
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    background: conic-gradient(
+      from 0deg at 0% 0%,
+      rgb(254, 248, 199) 0%,
+      rgb(250, 182, 173) 100%
+    );
+    box-shadow: -10px 0 10px rgb(250, 186, 154), 10px 0 10px rgb(251, 223, 164);
+
+    transform: scale(1.3);
+  }
+  100% {
+    opacity: 0.1;
+    background: conic-gradient(
+      from 0deg at 20% 0%,
+      rgb(252, 245, 196) 0%,
+      rgb(250, 165, 154) 100%
+    );
+    box-shadow: -10px 0 60px rgb(250, 186, 154), 10px 0 30px rgb(251, 223, 164);
+    transform: scale(1);
+  }
 }
 
 footer {

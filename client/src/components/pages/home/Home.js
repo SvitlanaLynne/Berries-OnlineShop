@@ -32,6 +32,8 @@ function Home() {
 
   return (
     <div id="home-container">
+      <div className="atmosphere-sun" id="flare2"></div>
+      <div className="atmosphere-sun" id="flare3"></div>
       <div
         className="user-message-pop-up"
         id="ON"

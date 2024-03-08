@@ -179,9 +179,6 @@ td img {
   align-items: flex-start;
   height: calc(var(--current-font-size) * 4);
 
-  /* border-width: 1px;
-  border-style: solid;
-  border-image: linear-gradient(transparent, var(--dark-green)) 1; */
   background: linear-gradient(
     transparent 0%,
     var(--lightlight-grey-background) 100%
@@ -353,5 +350,3 @@ option {
   color: var(--grey);
   font-weight: normal;
 }
-
-/* ----- ANIMATION ----- */
